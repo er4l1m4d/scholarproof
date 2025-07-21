@@ -20,14 +20,24 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+// Define explicit types for students and sessions
+interface Student {
+  id: string;
+  full_name: string;
+}
+interface Session {
+  id: string;
+  name: string;
+}
+
 export default function NewCertificatePage() {
-  const [students, setStudents] = useState<any[]>([]);
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<FormData | null>(null);
   const certificateRef = useRef<HTMLDivElement>(null);
-  const [exporting, setExporting] = useState(false);
+  // Removed exporting and setExporting
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<IrysUploadResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -39,7 +49,7 @@ export default function NewCertificatePage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
+    // Removed reset
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -58,16 +68,16 @@ export default function NewCertificatePage() {
           .select("id, full_name")
           .eq("role", "student");
         if (studentsError) throw studentsError;
-        setStudents(studentsData || []);
+        setStudents((studentsData as Student[]) || []);
 
         // Fetch sessions
         const { data: sessionsData, error: sessionsError } = await supabase
           .from("sessions")
           .select("id, name");
         if (sessionsError) throw sessionsError;
-        setSessions(sessionsData || []);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch data");
+        setSessions((sessionsData as Session[]) || []);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -85,8 +95,7 @@ export default function NewCertificatePage() {
   if (previewData) {
     const handleDownloadPDF = async () => {
       if (!certificateRef.current) return;
-      const arrayBuffer = await exportCertificate(certificateRef.current, "pdf");
-      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+      const blob = await exportCertificate(certificateRef.current, "pdf");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -101,12 +110,11 @@ export default function NewCertificatePage() {
       setUploadError(null);
       setUploadResult(null);
       try {
-        const arrayBuffer = await exportCertificate(certificateRef.current, "pdf");
-        const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+        const blob = await exportCertificate(certificateRef.current, "pdf");
         const result = await uploadToIrys(blob);
         setUploadResult(result);
-      } catch (err: any) {
-        setUploadError(err.message || "Upload failed");
+      } catch (err: unknown) {
+        setUploadError(err instanceof Error ? err.message : "Upload failed");
       } finally {
         setUploading(false);
       }
@@ -118,7 +126,7 @@ export default function NewCertificatePage() {
       setSaveError(null);
       setSaveSuccess(false);
       try {
-        const { data, error } = await saveCertificateToSupabase({
+        const { error } = await saveCertificateToSupabase({
           student_id: previewData.studentId,
           session_id: previewData.sessionId,
           title: previewData.title,
@@ -128,8 +136,8 @@ export default function NewCertificatePage() {
         });
         if (error) throw error;
         setSaveSuccess(true);
-      } catch (err: any) {
-        setSaveError(err.message || "Failed to save to Supabase");
+      } catch (err: unknown) {
+        setSaveError(err instanceof Error ? err.message : "Failed to save to Supabase");
       } finally {
         setSaving(false);
       }
