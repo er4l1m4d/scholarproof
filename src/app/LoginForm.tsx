@@ -56,11 +56,11 @@ const LoginForm = () => {
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
         </div>
         <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition">Login</button>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don&apos;t have an account?{' '}
+          <a href="/signup" className="text-blue-700 hover:underline">Sign up here</a>
+        </p>
       </form>
-      <p className="mt-4 text-center text-sm text-gray-600">
-        Don&apos;t have an account?{' '}
-        <a href="/signup" className="text-blue-700 hover:underline">Sign up here</a>
-      </p>
     </>
   );
 };

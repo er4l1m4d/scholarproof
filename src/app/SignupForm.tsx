@@ -138,11 +138,11 @@ const SignupForm = () => {
         <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition" disabled={loading}>
           {loading ? 'Signing Up...' : 'Sign Up'}
         </button>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <a href="/login" className="text-blue-700 hover:underline">Login here</a>
+        </p>
       </form>
-      <p className="mt-4 text-center text-sm text-gray-600">
-        Already have an account?{' '}
-        <a href="/login" className="text-blue-700 hover:underline">Login here</a>
-      </p>
     </>
   );
 };
