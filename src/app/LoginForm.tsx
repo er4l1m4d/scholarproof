@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from './supabaseClient';
 import toast from 'react-hot-toast';
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');

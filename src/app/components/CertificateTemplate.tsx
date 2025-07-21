@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface CertificateTemplateProps {
   studentName: string;
@@ -23,7 +24,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
     <div className="bg-white shadow-xl rounded-lg border-4 border-gray-200 p-8 max-w-2xl mx-auto font-sans relative print:max-w-full print:shadow-none print:border-0 print:p-4">
       {/* Logo and Institution */}
       <div className="flex items-center justify-center mb-6">
-        <img src={institutionLogoUrl} alt="Institution Logo" className="h-16 w-16 mr-4" />
+        <Image src={institutionLogoUrl} alt="Institution Logo" width={64} height={64} className="h-16 w-16 mr-4" />
         <span className="text-2xl font-bold tracking-wide uppercase text-gray-800">{institutionName}</span>
       </div>
       {/* Title */}

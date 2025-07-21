@@ -14,8 +14,7 @@ export type ExportType = "png" | "pdf";
  */
 export async function exportCertificate(
   element: HTMLElement,
-  type: ExportType = "png",
-  fileName = "certificate"
+  type: ExportType = "png"
 ): Promise<Blob> {
   // Use html2canvas to render the element
   const canvas = await html2canvas(element, {
