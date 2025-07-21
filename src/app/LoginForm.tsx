@@ -7,7 +7,7 @@ const LoginForm = () => {
 
   const validate = () => {
     let valid = true;
-    let errs = { email: '', password: '' };
+    const errs = { email: '', password: '' };
     if (!email) {
       errs.email = 'Email is required.';
       valid = false;

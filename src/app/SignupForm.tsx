@@ -11,7 +11,7 @@ const SignupForm = () => {
 
   const validate = () => {
     let valid = true;
-    let errs = { email: '', password: '', inviteCode: '', general: '' };
+    const errs = { email: '', password: '', inviteCode: '', general: '' };
     if (!email) {
       errs.email = 'Email is required.';
       valid = false;
@@ -129,7 +129,7 @@ const SignupForm = () => {
           onChange={e => setInviteCode(e.target.value)}
           disabled={loading}
         />
-        <p className="text-gray-500 text-xs mt-1">Leave blank if you're a student. Required for staff sign up.</p>
+        <p className="text-gray-500 text-xs mt-1">Leave blank if you&apos;re a student. Required for staff sign up.</p>
         {errors.inviteCode && <p className="text-red-500 text-sm mt-1">{errors.inviteCode}</p>}
       </div>
       <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition" disabled={loading}>
