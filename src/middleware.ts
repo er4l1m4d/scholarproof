@@ -9,6 +9,15 @@ function getDashboardRole(pathname: string): 'student' | 'lecturer' | 'admin' | 
   return null;
 }
 
+// Helper to decode JWT and extract user ID (sub claim)
+function parseJwt(token: string) {
+  try {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const dashboardRole = getDashboardRole(pathname);
@@ -21,11 +30,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
+  // Decode JWT to get user ID
+  const jwt = parseJwt(supabaseToken);
+  const userId = jwt?.sub;
+  if (!userId) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
+
   // Fetch user role from Supabase (API call)
-  // You must set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your env
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const userRes = await fetch(`${supabaseUrl}/rest/v1/users?select=role&id=eq.auth`, {
+  const userRes = await fetch(`${supabaseUrl}/rest/v1/users?select=role&id=eq.${userId}`, {
     headers: {
       'apikey': supabaseAnonKey || '',
       'Authorization': `Bearer ${supabaseToken}`,
