@@ -100,4 +100,10 @@ export default function Home() {
       </footer>
     </div>
   );
+
+     // ... existing code ...
+     <footer className="mt-8 text-center text-gray-500 text-sm">
+     &copy; {new Date().getFullYear()} ScholarProof. All rights reserved.
+   </footer>
+   // ... existing code ...
 }
