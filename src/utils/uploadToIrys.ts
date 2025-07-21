@@ -26,8 +26,7 @@ export async function uploadToIrys(file: Blob): Promise<IrysUploadResult> {
 
   // Upload
   const receipt = await irys.upload(buffer, {
-    tags: [{ name: "App", value: "ScholarProof" }],
-    contentType: file.type,
+    tags: [{ name: "App", value: "ScholarProof" }]
   });
 
   return {
