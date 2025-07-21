@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
 
 const SignupForm = () => {
   const [email, setEmail] = useState('');
@@ -68,6 +69,10 @@ const SignupForm = () => {
       setLoading(false);
       toast.error(signUpError?.message || 'Signup failed.');
       return;
+    }
+    // Set session cookie for middleware (if session exists)
+    if (authUser.session) {
+      await supabase.auth.setSession(authUser.session);
     }
 
     // 3. Insert into users table

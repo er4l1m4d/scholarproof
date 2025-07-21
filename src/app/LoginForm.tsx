@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from './supabaseClient';
 import toast from 'react-hot-toast';
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -38,6 +39,10 @@ const LoginForm = () => {
       setErrors(errs => ({ ...errs, password: loginError?.message || 'Login failed.' }));
       toast.error(loginError?.message || 'Login failed.');
       return;
+    }
+    // Set session cookie for middleware
+    if (authUser.session) {
+      await supabase.auth.setSession(authUser.session);
     }
     // Fetch user role
     const { data: userData, error: userError } = await supabase
