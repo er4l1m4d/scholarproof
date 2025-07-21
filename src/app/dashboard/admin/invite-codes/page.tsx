@@ -3,8 +3,15 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import toast from 'react-hot-toast';
 
+type InviteCode = {
+  code: string;
+  role: 'lecturer' | 'admin';
+  used: boolean;
+  created_at: string;
+};
+
 export default function InviteCodesPage() {
-  const [codes, setCodes] = useState<any[]>([]);
+  const [codes, setCodes] = useState<InviteCode[]>([]);
   const [code, setCode] = useState('');
   const [role, setRole] = useState('lecturer');
   const [loading, setLoading] = useState(false);
@@ -118,7 +125,7 @@ export default function InviteCodesPage() {
               </tr>
             </thead>
             <tbody>
-              {codes.map((c: any) => (
+              {codes.map((c: InviteCode) => (
                 <tr key={c.code}>
                   <td className="py-2 px-3 border font-mono">{c.code}</td>
                   <td className="py-2 px-3 border capitalize">{c.role}</td>
