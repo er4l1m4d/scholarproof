@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from './supabaseClient';
+import toast from 'react-hot-toast';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const router = useRouter();
 
   const validate = () => {
     let valid = true;
@@ -22,11 +26,35 @@ const LoginForm = () => {
     return valid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    // TODO: Integrate with Supabase login logic
-    alert('Login submitted!');
+    // Supabase login logic
+    const { data: authUser, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (loginError || !authUser.user) {
+      setErrors(errs => ({ ...errs, password: loginError?.message || 'Login failed.' }));
+      toast.error(loginError?.message || 'Login failed.');
+      return;
+    }
+    // Fetch user role
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', authUser.user.id)
+      .single();
+    if (userError || !userData) {
+      setErrors(errs => ({ ...errs, password: 'Could not fetch user role.' }));
+      toast.error('Could not fetch user role.');
+      return;
+    }
+    // Redirect to dashboard based on role
+    if (userData.role === 'student') router.push('/dashboard/student');
+    else if (userData.role === 'lecturer') router.push('/dashboard/lecturer');
+    else if (userData.role === 'admin') router.push('/dashboard/admin');
+    toast.success('Login successful!');
   };
 
   return (

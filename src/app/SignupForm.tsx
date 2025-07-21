@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const SignupForm = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +12,7 @@ const SignupForm = () => {
   const [errors, setErrors] = useState({ email: '', password: '', inviteCode: '', general: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
+  const router = useRouter();
 
   const validate = () => {
     let valid = true;
@@ -49,6 +52,7 @@ const SignupForm = () => {
       if (inviteError || !invite) {
         setErrors(errs => ({ ...errs, inviteCode: 'Invalid or used invite code.' }));
         setLoading(false);
+        toast.error('Invalid or used invite code.');
         return;
       }
       assignedRole = invite.role;
@@ -62,6 +66,7 @@ const SignupForm = () => {
     if (signUpError || !authUser.user) {
       setErrors(errs => ({ ...errs, general: signUpError?.message || 'Signup failed.' }));
       setLoading(false);
+      toast.error(signUpError?.message || 'Signup failed.');
       return;
     }
 
@@ -74,6 +79,7 @@ const SignupForm = () => {
     if (userInsertError) {
       setErrors(errs => ({ ...errs, general: userInsertError.message }));
       setLoading(false);
+      toast.error(userInsertError.message);
       return;
     }
 
@@ -85,7 +91,16 @@ const SignupForm = () => {
         .eq('code', inviteCode);
     }
 
-    setSuccess('Signup successful! Please check your email to verify your account.');
+    // Redirect to dashboard based on role
+    if (assignedRole === 'student') {
+      router.push('/dashboard/student');
+    } else if (assignedRole === 'lecturer') {
+      router.push('/dashboard/lecturer');
+    } else if (assignedRole === 'admin') {
+      router.push('/dashboard/admin');
+    }
+
+    toast.success('Signup successful! Please check your email to verify your account.');
     setEmail('');
     setPassword('');
     setInviteCode('');
