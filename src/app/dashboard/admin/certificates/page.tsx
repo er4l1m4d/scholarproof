@@ -14,6 +14,15 @@ interface Certificate {
   session?: { id: string; name: string };
 }
 
+interface RawCertificate {
+  id: string;
+  title?: string;
+  created_at?: string;
+  status?: string;
+  students?: { id: string; name: string }[];
+  sessions?: { id: string; name: string }[];
+}
+
 export default function AdminCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -45,10 +54,10 @@ export default function AdminCertificatesPage() {
     } else {
       // Map to flatten student/session
       setCertificates(
-        data.map((cert: any) => ({
+        data.map((cert: RawCertificate) => ({
           ...cert,
-          student: cert.students,
-          session: cert.sessions,
+          student: cert.students && cert.students.length > 0 ? cert.students[0] : undefined,
+          session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
         }))
       );
     }
