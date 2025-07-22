@@ -26,6 +26,28 @@ const sidebarTabs = {
   ],
 };
 
+// Add SVG icon components for Heroicons
+const icons = {
+  Dashboard: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 0H7m6 0v6m0 0h6m-6 0H7" /></svg>
+  ),
+  'My Sessions': (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10m-10 4h6m-6 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+  ),
+  Sessions: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10m-10 4h6m-6 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+  ),
+  Certificates: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z" /></svg>
+  ),
+  Students: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-6.13a4 4 0 11-8 0 4 4 0 018 0zm6 6.13A4 4 0 0016 18v2m-8-2a4 4 0 00-4-4" /></svg>
+  ),
+  'Invite Codes': (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2h6zm-2 4v2m0 4h.01" /></svg>
+  ),
+};
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => {
   const pathname = usePathname();
   const tabs = sidebarTabs[role];
@@ -136,8 +158,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
                       : 'text-gray-700 hover:bg-gray-100'
                   } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
                 >
-                  {/* Icon placeholder (replace with real icons if desired) */}
-                  <span className="inline-block w-5 h-5 bg-gray-200 rounded-full" />
+                  {icons[tab.name as keyof typeof icons]}
                   {!sidebarCollapsed && <span>{tab.name}</span>}
                 </Link>
               </li>
