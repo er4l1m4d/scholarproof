@@ -1,15 +1,65 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import CertificateCard from '../../components/CertificateCard';
+import { getStudentCertificates } from '../../../utils/getStudentCertificates';
+
+type Certificate = {
+  id: string;
+  title?: string;
+  created_at?: string;
+  irys_url?: string;
+  revoked?: boolean;
+  sessions?: { id?: string; name?: string };
+};
 
 export default function StudentDashboard() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [sessionFilter, setSessionFilter] = useState<string>('all');
-  // Placeholder session options
-  const sessionOptions = [
-    { id: 'all', name: 'All Sessions' },
-    { id: '2024-term1', name: '2024/Term 1' },
-    { id: '2023-term2', name: '2023/Term 2' },
-  ];
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Dynamically extract unique sessions from certificates
+  const sessionOptions = useMemo(() => {
+    const sessions = certificates
+      .map(cert => cert.sessions)
+      .filter((s): s is { id: string; name: string } => !!s && !!s.id && !!s.name)
+      .map(s => ({ id: s.id, name: s.name }));
+    const unique = Array.from(new Map(sessions.map(s => [s.id, s])).values());
+    return [{ id: 'all', name: 'All Sessions' }, ...unique];
+  }, [certificates]);
+
+  useEffect(() => {
+    async function fetchCertificates() {
+      try {
+        setLoading(true);
+        setError(null);
+        // TODO: Replace with real student ID from auth/session
+        const studentId = 'demo-student-id';
+        const data = await getStudentCertificates(studentId);
+        setCertificates(data || []);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch certificates');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCertificates();
+  }, []);
+
+  // Filter and sort certificates
+  const displayedCertificates = useMemo(() => {
+    let filtered = certificates;
+    if (sessionFilter !== 'all') {
+      filtered = filtered.filter(cert => cert.sessions?.id === sessionFilter);
+    }
+    filtered = filtered.slice().sort((a, b) => {
+      const dateA = new Date(a.created_at ?? '').getTime();
+      const dateB = new Date(b.created_at ?? '').getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    return filtered;
+  }, [certificates, sortOrder, sessionFilter]);
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-50 font-sans p-4">
@@ -47,10 +97,19 @@ export default function StudentDashboard() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Placeholder for certificate cards */}
-          <div className="col-span-full text-center text-gray-400">No certificates found. (Data will appear here)</div>
-        </div>
+        {loading && <div className="text-center text-gray-500">Loading certificates...</div>}
+        {error && <div className="text-center text-red-500">{error}</div>}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {displayedCertificates.length === 0 ? (
+              <div className="col-span-full text-center text-gray-400">No certificates found.</div>
+            ) : (
+              displayedCertificates.map((cert) => (
+                <CertificateCard key={cert.id} cert={cert} />
+              ))
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
