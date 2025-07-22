@@ -35,6 +35,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false); // for mobile
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // for desktop
 
   useEffect(() => {
     if (showProfileModal) {
@@ -92,10 +94,35 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
 
   return (
     <div className="min-h-screen flex bg-gray-50 font-sans">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col py-6 px-4">
-        <div className="mb-8">
-          <span className="text-xl font-bold text-blue-800">ScholarProof</span>
+      {/* Sidebar (responsive) */}
+      <aside
+        className={`
+          fixed z-40 top-0 left-0 h-full bg-white border-r flex flex-col py-6 px-4 transition-all duration-200
+          md:static md:translate-x-0 md:w-64
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${sidebarCollapsed ? 'w-20 md:w-20' : 'w-64'}
+          md:flex
+        `}
+        style={{ minWidth: sidebarCollapsed ? 80 : 256 }}
+      >
+        <div className="mb-8 flex items-center justify-between">
+          <span className={`text-xl font-bold text-blue-800 transition-all ${sidebarCollapsed ? 'hidden md:inline-block' : ''}`}>ScholarProof</span>
+          {/* Collapse button (desktop only) */}
+          <button
+            className="hidden md:inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto"
+            onClick={() => setSidebarCollapsed(c => !c)}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? <span className="text-xl">▶</span> : <span className="text-xl">◀</span>}
+          </button>
+          {/* Close button (mobile only) */}
+          <button
+            className="md:hidden inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            &times;
+          </button>
         </div>
         <nav className="flex-1">
           <ul className="space-y-2">
@@ -103,13 +130,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
               <li key={tab.name}>
                 <Link
                   href={tab.href}
-                  className={`block px-4 py-2 rounded transition font-medium ${
+                  className={`flex items-center gap-3 px-4 py-2 rounded transition font-medium ${
                     pathname === tab.href
                       ? 'bg-blue-100 text-blue-800'
                       : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
                 >
-                  {tab.name}
+                  {/* Icon placeholder (replace with real icons if desired) */}
+                  <span className="inline-block w-5 h-5 bg-gray-200 rounded-full" />
+                  {!sidebarCollapsed && <span>{tab.name}</span>}
                 </Link>
               </li>
             ))}
@@ -117,11 +146,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
         </nav>
       </aside>
 
+      {/* Overlay for mobile drawer */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-30 bg-black bg-opacity-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Main Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col md:ml-0" style={{ marginLeft: 0 }}>
         {/* Topbar */}
         <header className="h-16 bg-white border-b flex items-center justify-between px-8">
           <div className="flex items-center gap-4">
+            {/* Hamburger for mobile */}
+            <button
+              className="md:hidden inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <span className="text-2xl">☰</span>
+            </button>
             <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold">
               {role.charAt(0).toUpperCase() + role.slice(1)}
             </span>
