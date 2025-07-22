@@ -12,6 +12,8 @@ interface Session {
   status?: string;
 }
 
+interface LecturerOption { id: string; name: string; email?: string; }
+
 const statusOptions = ['Active', 'Inactive', 'Upcoming', 'Completed'];
 
 export default function AdminSessionsPage() {
@@ -30,6 +32,11 @@ export default function AdminSessionsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [assignSessionId, setAssignSessionId] = useState<string | null>(null);
+  const [lecturers, setLecturers] = useState<LecturerOption[]>([]);
+  const [assignedLecturers, setAssignedLecturers] = useState<string[]>([]);
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [assignError, setAssignError] = useState('');
 
   useEffect(() => {
     if (role === 'admin') {
@@ -137,6 +144,51 @@ export default function AdminSessionsPage() {
       fetchSessions(page); // Re-fetch current page after delete
     }
     setDeleteLoading(false);
+  }
+
+  async function openAssignLecturersModal(sessionId: string) {
+    setAssignSessionId(sessionId);
+    setAssignError('');
+    setAssignLoading(true);
+    // Fetch all lecturers
+    const { data: allLecturers } = await supabase.from('users').select('id, name, email').eq('role', 'lecturer').order('name');
+    setLecturers(allLecturers || []);
+    // Fetch assigned lecturers for this session
+    const { data: assigned } = await supabase.from('lecturer_sessions').select('user_id').eq('session_id', sessionId);
+    setAssignedLecturers((assigned || []).map((l: { user_id: string }) => l.user_id));
+    setAssignLoading(false);
+  }
+
+  function closeAssignLecturersModal() {
+    setAssignSessionId(null);
+    setLecturers([]);
+    setAssignedLecturers([]);
+    setAssignError('');
+  }
+
+  async function handleAssignLecturersSave() {
+    if (!assignSessionId) return;
+    setAssignLoading(true);
+    setAssignError('');
+    // Fetch current assignments
+    const { data: current } = await supabase.from('lecturer_sessions').select('user_id').eq('session_id', assignSessionId);
+    const currentIds = (current || []).map((l: { user_id: string }) => l.user_id);
+    // Calculate adds and removes
+    const toAdd = assignedLecturers.filter(id => !currentIds.includes(id));
+    const toRemove = currentIds.filter(id => !assignedLecturers.includes(id));
+    // Add new assignments
+    if (toAdd.length > 0) {
+      const inserts = toAdd.map(user_id => ({ user_id, session_id: assignSessionId }));
+      const { error } = await supabase.from('lecturer_sessions').insert(inserts);
+      if (error) setAssignError(error.message);
+    }
+    // Remove unassigned
+    if (toRemove.length > 0) {
+      const { error } = await supabase.from('lecturer_sessions').delete().eq('session_id', assignSessionId).in('user_id', toRemove);
+      if (error) setAssignError(error.message);
+    }
+    setAssignLoading(false);
+    closeAssignLecturersModal();
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -251,6 +303,47 @@ export default function AdminSessionsPage() {
           </div>
         </div>
       )}
+      {assignSessionId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={closeAssignLecturersModal} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800">Assign Lecturers</h3>
+            {assignLoading ? (
+              <div className="text-center py-4 text-gray-500">Loading...</div>
+            ) : (
+              <form onSubmit={e => { e.preventDefault(); handleAssignLecturersSave(); }} className="space-y-4">
+                <div>
+                  <label className="block mb-1 font-medium">Lecturers</label>
+                  <div className="max-h-48 overflow-y-auto border rounded p-2 bg-gray-50">
+                    {lecturers.length === 0 ? (
+                      <div className="text-gray-400">No lecturers found.</div>
+                    ) : (
+                      lecturers.map(l => (
+                        <label key={l.id} className="flex items-center gap-2 py-1">
+                          <input
+                            type="checkbox"
+                            checked={assignedLecturers.includes(l.id)}
+                            onChange={e => {
+                              if (e.target.checked) setAssignedLecturers(ids => [...ids, l.id]);
+                              else setAssignedLecturers(ids => ids.filter(id => id !== l.id));
+                            }}
+                          />
+                          <span>{l.name || l.email}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </div>
+                {assignError && <div className="text-red-600 text-sm">{assignError}</div>}
+                <div className="flex justify-end gap-2">
+                  <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={closeAssignLecturersModal} disabled={assignLoading}>Cancel</button>
+                  <button type="submit" className="px-4 py-2 rounded bg-blue-700 hover:bg-blue-800 text-white font-medium" disabled={assignLoading}>{assignLoading ? 'Saving...' : 'Save'}</button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
       <div className="bg-white rounded shadow p-4">
         {loadingSessions ? (
           <div className="text-center py-8 text-gray-500">Loading sessions...</div>
@@ -278,6 +371,7 @@ export default function AdminSessionsPage() {
                     <td className="py-2 px-3 border">
                       <button className="text-blue-700 hover:underline mr-2" onClick={() => openEditModal(session)}>Edit</button>
                       <button className="text-red-600 hover:underline" onClick={() => openDeleteDialog(session.id)}>Delete</button>
+                      <button className="text-green-700 hover:underline ml-2" onClick={() => openAssignLecturersModal(session.id)}>Assign Lecturers</button>
                     </td>
                   </tr>
                 ))}
