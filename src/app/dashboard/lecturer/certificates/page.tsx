@@ -13,6 +13,12 @@ interface Certificate {
   session?: { id: string; name: string };
 }
 
+interface EditForm {
+  id: string;
+  title: string;
+  status: string;
+}
+
 export default function LecturerCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -22,6 +28,15 @@ export default function LecturerCertificatesPage() {
   const [studentFilter, setStudentFilter] = useState('');
   const [sessionFilter, setSessionFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [editCert, setEditCert] = useState<EditForm | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [revokeId, setRevokeId] = useState<string | null>(null);
+  const [revokeLoading, setRevokeLoading] = useState(false);
+  const [revokeError, setRevokeError] = useState('');
+  const [regenId, setRegenId] = useState<string | null>(null);
+  const [regenLoading, setRegenLoading] = useState(false);
+  const [regenError, setRegenError] = useState('');
 
   useEffect(() => {
     if (role === 'lecturer') {
@@ -86,6 +101,64 @@ export default function LecturerCertificatesPage() {
     );
   });
 
+  function openEditModal(cert: Certificate) {
+    setEditCert({ id: cert.id, title: cert.title || '', status: cert.status || '' });
+    setEditError('');
+  }
+
+  async function handleEditCert(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editCert) return;
+    setEditLoading(true);
+    setEditError('');
+    const { error } = await supabase.from('certificates').update({
+      title: editCert.title,
+      status: editCert.status,
+    }).eq('id', editCert.id);
+    if (error) setEditError(error.message);
+    else {
+      setEditCert(null);
+      fetchLecturerCertificates();
+    }
+    setEditLoading(false);
+  }
+
+  function openRevokeDialog(id: string) {
+    setRevokeId(id);
+    setRevokeError('');
+  }
+
+  async function handleRevokeCert() {
+    if (!revokeId) return;
+    setRevokeLoading(true);
+    setRevokeError('');
+    const { error } = await supabase.from('certificates').update({ status: 'Revoked' }).eq('id', revokeId);
+    if (error) setRevokeError(error.message);
+    else {
+      setRevokeId(null);
+      fetchLecturerCertificates();
+    }
+    setRevokeLoading(false);
+  }
+
+  function openRegenDialog(id: string) {
+    setRegenId(id);
+    setRegenError('');
+  }
+
+  async function handleRegenCert() {
+    if (!regenId) return;
+    setRegenLoading(true);
+    setRegenError('');
+    const { error } = await supabase.from('certificates').update({ status: 'Regenerated', regenerated_at: new Date().toISOString() }).eq('id', regenId);
+    if (error) setRegenError(error.message);
+    else {
+      setRegenId(null);
+      fetchLecturerCertificates();
+    }
+    setRegenLoading(false);
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'lecturer') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
 
@@ -146,9 +219,9 @@ export default function LecturerCertificatesPage() {
                     <td className="py-2 px-3 border">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : '-'}</td>
                     <td className="py-2 px-3 border">{cert.status || '-'}</td>
                     <td className="py-2 px-3 border">
-                      <button className="text-blue-700 hover:underline mr-2" onClick={() => alert('Edit coming soon!')}>Edit</button>
-                      <button className="text-yellow-700 hover:underline mr-2" onClick={() => alert('Regenerate coming soon!')}>Regenerate</button>
-                      <button className="text-red-600 hover:underline" onClick={() => alert('Revoke coming soon!')}>Revoke</button>
+                      <button className="text-blue-700 hover:underline mr-2" onClick={() => openEditModal(cert)}>Edit</button>
+                      <button className="text-yellow-700 hover:underline mr-2" onClick={() => openRegenDialog(cert.id)}>Regenerate</button>
+                      <button className="text-red-600 hover:underline" onClick={() => openRevokeDialog(cert.id)}>Revoke</button>
                     </td>
                   </tr>
                 ))}
@@ -157,6 +230,52 @@ export default function LecturerCertificatesPage() {
           </div>
         )}
       </div>
+      {editCert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setEditCert(null)} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800">Edit Certificate</h3>
+            <form onSubmit={handleEditCert} className="space-y-4">
+              <div>
+                <label className="block mb-1 font-medium">Title</label>
+                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300" value={editCert.title} onChange={e => setEditCert(c => c ? { ...c, title: e.target.value } : c)} required />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Status</label>
+                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300" value={editCert.status} onChange={e => setEditCert(c => c ? { ...c, status: e.target.value } : c)} required />
+              </div>
+              {editError && <div className="text-red-600 text-sm">{editError}</div>}
+              <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={editLoading}>{editLoading ? 'Saving...' : 'Save Changes'}</button>
+            </form>
+          </div>
+        </div>
+      )}
+      {revokeId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h3 className="text-lg font-bold mb-4 text-red-700">Revoke Certificate</h3>
+            <p className="mb-4">Are you sure you want to revoke this certificate? This action cannot be undone.</p>
+            {revokeError && <div className="text-red-600 text-sm mb-2">{revokeError}</div>}
+            <div className="flex justify-end gap-2">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={() => setRevokeId(null)} disabled={revokeLoading}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-medium" onClick={handleRevokeCert} disabled={revokeLoading}>{revokeLoading ? 'Revoking...' : 'Revoke'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {regenId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h3 className="text-lg font-bold mb-4 text-yellow-700">Regenerate Certificate</h3>
+            <p className="mb-4">Are you sure you want to regenerate this certificate?</p>
+            {regenError && <div className="text-red-600 text-sm mb-2">{regenError}</div>}
+            <div className="flex justify-end gap-2">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={() => setRegenId(null)} disabled={regenLoading}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-yellow-600 hover:bg-yellow-700 text-white font-medium" onClick={handleRegenCert} disabled={regenLoading}>{regenLoading ? 'Regenerating...' : 'Regenerate'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 } 
