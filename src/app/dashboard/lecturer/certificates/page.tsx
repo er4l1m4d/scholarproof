@@ -19,6 +19,15 @@ interface EditForm {
   status: string;
 }
 
+interface RawCertificate {
+  id: string;
+  title?: string;
+  created_at?: string;
+  status?: string;
+  students?: { id: string; name: string }[];
+  sessions?: { id: string; name: string }[];
+}
+
 export default function LecturerCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -82,7 +91,7 @@ export default function LecturerCertificatesPage() {
       setCertificates([]);
     } else {
       setCertificates(
-        data.map((cert: any) => ({
+        data.map((cert: RawCertificate) => ({
           ...cert,
           student: cert.students && cert.students.length > 0 ? cert.students[0] : undefined,
           session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
