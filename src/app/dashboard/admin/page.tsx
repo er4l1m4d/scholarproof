@@ -6,10 +6,17 @@ import { supabase } from '../../supabaseClient';
 import { getSessionSummaries } from '@/app/utils/getSessionSummaries';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
+interface SessionSummary {
+  id: string;
+  name: string;
+  created_at: string;
+  certCount: number;
+}
+
 export default function AdminDashboard() {
   const { role, loading, error } = useUserRole();
   const [name, setName] = useState<string | null>(null);
-  const [sessionSummaries, setSessionSummaries] = useState<any[]>([]);
+  const [sessionSummaries, setSessionSummaries] = useState<SessionSummary[]>([]);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('all');
@@ -32,8 +39,12 @@ export default function AdminDashboard() {
       try {
         const data = await getSessionSummaries();
         setSessionSummaries(data);
-      } catch (err: any) {
-        setSummaryError(err.message || 'Failed to fetch session summaries');
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setSummaryError(err.message);
+        } else {
+          setSummaryError('Failed to fetch session summaries');
+        }
       } finally {
         setSummaryLoading(false);
       }
