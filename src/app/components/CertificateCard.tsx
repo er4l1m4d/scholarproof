@@ -8,6 +8,7 @@ interface CertificateCardProps {
     irys_url?: string;
     revoked?: boolean;
     sessions?: { name?: string };
+    status?: string;
   };
 }
 
@@ -51,13 +52,36 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ cert }) => {
     <div className={`relative border rounded p-4 shadow-sm bg-white flex flex-col gap-2 ${isRevoked ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-2">
         <span className="font-semibold text-lg">{cert.title || 'Certificate'}</span>
+        {cert.sessions?.name && (
+          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded ml-2">
+            {cert.sessions.name}
+          </span>
+        )}
+        {cert.status && (
+          <span
+            className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ml-2
+              ${
+                cert.status === 'Active'
+                  ? 'bg-green-100 text-green-800'
+                  : cert.status === 'Pending'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : cert.status === 'Completed'
+                  ? 'bg-blue-100 text-blue-800'
+                  : cert.status === 'Revoked'
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-gray-100 text-gray-800'
+              }
+            `}
+          >
+            {cert.status}
+          </span>
+        )}
         {isRevoked && (
           <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded font-bold" title="This certificate has been revoked by an admin.">
             Revoked
           </span>
         )}
       </div>
-      <div className="text-sm text-gray-500">Session: {cert.sessions?.name || 'N/A'}</div>
       <div className="text-xs text-gray-400">Issued: {cert.created_at?.slice(0, 10) || 'N/A'}</div>
       <div className="flex gap-2 mt-2 flex-wrap">
         <a

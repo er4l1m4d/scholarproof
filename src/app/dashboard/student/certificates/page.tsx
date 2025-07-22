@@ -20,6 +20,7 @@ export default function StudentCertificatesPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [collapsed, setCollapsed] = useState<{ [sessionId: string]: boolean }>({});
   const pageSize = 9;
 
   useEffect(() => {
@@ -51,6 +52,9 @@ export default function StudentCertificatesPage() {
         }));
         setCertificates(mapped);
         setTotalCount(count || 0);
+        // Set all sessions expanded by default
+        const sessionIds = Array.from(new Set(mapped.map(c => c.session?.id || 'no-session')));
+        setCollapsed(Object.fromEntries(sessionIds.map(id => [id, false])));
       }
       setLoading(false);
     }
@@ -69,6 +73,15 @@ export default function StudentCertificatesPage() {
 
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
+  // Group certificates by session
+  const grouped = certificates.reduce((acc, cert) => {
+    const sessionId = cert.session?.id || 'no-session';
+    const sessionName = cert.session?.name || 'No Session';
+    if (!acc[sessionId]) acc[sessionId] = { name: sessionName, certs: [] };
+    acc[sessionId].certs.push(cert);
+    return acc;
+  }, {} as Record<string, { name: string; certs: Certificate[] }>);
+
   return (
     <DashboardLayout role="student">
       <div className="max-w-4xl mx-auto">
@@ -82,30 +95,45 @@ export default function StudentCertificatesPage() {
         ) : certificates.length === 0 ? (
           <div className="text-center text-gray-500 dark:text-gray-300">No certificates found.</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {certificates.map(cert => (
-              <div key={cert.id} className="bg-white dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
-                <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
-                {cert.session && (
-                  <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">Session: <span className="font-semibold text-gray-900 dark:text-gray-100">{cert.session.name}</span></div>
-                )}
-                <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium text-blue-700 dark:text-blue-300">{cert.status || 'Active'}</span></div>
+          <div className="space-y-6">
+            {Object.entries(grouped).map(([sessionId, group]) => (
+              <div key={sessionId} className="border rounded-lg shadow bg-white dark:bg-gray-800">
                 <button
-                  className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mb-2"
-                  onClick={() => handleCopyLink(cert.id)}
+                  className="w-full flex justify-between items-center px-4 py-3 bg-gray-100 dark:bg-gray-900 rounded-t-lg focus:outline-none"
+                  onClick={() => setCollapsed(c => ({ ...c, [sessionId]: !c[sessionId] }))}
                 >
-                  Copy Verification Link
+                  <span className="font-semibold text-blue-700 dark:text-blue-300 text-lg">{group.name}</span>
+                  <span className="text-xs text-gray-500">{collapsed[sessionId] ? 'Show' : 'Hide'} ({group.certs.length})</span>
                 </button>
-                {cert.irys_url && (
-                  <a
-                    href={cert.irys_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-700 dark:text-blue-300 hover:underline mt-1"
-                  >
-                    View on Irys
-                  </a>
+                {!collapsed[sessionId] && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+                    {group.certs.map(cert => (
+                      <div key={cert.id} className="bg-white dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
+                        <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                        {cert.session && (
+                          <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">Session: <span className="font-semibold text-gray-900 dark:text-gray-100">{cert.session.name}</span></div>
+                        )}
+                        <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium text-blue-700 dark:text-blue-300">{cert.status || 'Active'}</span></div>
+                        <button
+                          className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mb-2"
+                          onClick={() => handleCopyLink(cert.id)}
+                        >
+                          Copy Verification Link
+                        </button>
+                        {cert.irys_url && (
+                          <a
+                            href={cert.irys_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-700 dark:text-blue-300 hover:underline mt-1"
+                          >
+                            View on Irys
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             ))}

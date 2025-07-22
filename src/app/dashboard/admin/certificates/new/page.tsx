@@ -73,7 +73,8 @@ export default function NewCertificatePage() {
         // Fetch sessions
         const { data: sessionsData, error: sessionsError } = await supabase
           .from("sessions")
-          .select("id, name");
+          .select("id, name")
+          .eq("active", true); // Only fetch active sessions
         if (sessionsError) throw sessionsError;
         setSessions((sessionsData as Session[]) || []);
       } catch (err: unknown) {
