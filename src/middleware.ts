@@ -9,10 +9,18 @@ function getDashboardRole(pathname: string): 'student' | 'lecturer' | 'admin' | 
   return null;
 }
 
+function isRootRoleRoute(pathname: string): 'student' | 'lecturer' | 'admin' | null {
+  if (pathname === '/student') return 'student';
+  if (pathname === '/lecturer') return 'lecturer';
+  if (pathname === '/admin') return 'admin';
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const dashboardRole = getDashboardRole(pathname);
-  if (!dashboardRole) return NextResponse.next();
+  const rootRoleRoute = isRootRoleRoute(pathname);
+  const isDashboardRoot = pathname === '/dashboard';
 
   // Create a Supabase client with the request and response
   const response = NextResponse.next();
@@ -40,13 +48,34 @@ export async function middleware(request: NextRequest) {
 
   const userRole = userData.role;
 
-  if (userRole !== dashboardRole) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
+  // Handle /admin, /lecturer, /student root routes
+  if (rootRoleRoute) {
+    if (userRole === rootRoleRoute) {
+      return NextResponse.redirect(new URL(`/dashboard/${userRole}`, request.url));
+    } else {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+  }
+
+  // Handle /dashboard root
+  if (isDashboardRoot) {
+    if (userRole === 'admin' || userRole === 'lecturer' || userRole === 'student') {
+      return NextResponse.redirect(new URL(`/dashboard/${userRole}`, request.url));
+    } else {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+  }
+
+  // Handle /dashboard/role routes
+  if (dashboardRole) {
+    if (userRole !== dashboardRole) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/admin', '/lecturer', '/student', '/dashboard'],
 }; 
