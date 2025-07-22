@@ -51,11 +51,27 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
   const [profileError, setProfileError] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false); // for mobile
+  const [menuOpen, setMenuOpen] = useState(false);
   // Remove sidebarCollapsed state and all collapse logic
   // Use only sidebarOpen for toggling
   // Sidebar is always a drawer (overlays content with backdrop)
   // Remove collapse button, always show full icons and labels
   // Hamburger menu toggles sidebar on all screen sizes
+
+  // Close menu on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest('.profile-menu')) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClick);
+    } else {
+      document.removeEventListener('mousedown', handleClick);
+    }
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (showProfileModal) {
@@ -182,12 +198,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
               <span>{role.charAt(0).toUpperCase()}</span>
             </div>
             {/* Menu */}
-            <div className="relative group">
-              <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-900 dark:text-gray-100">Menu ▾</button>
-              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-10">
-                <button onClick={() => setShowProfileModal(true)} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Edit Profile</button>
-                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Logout</button>
-              </div>
+            <div className="relative profile-menu">
+              <button
+                className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-900 dark:text-gray-100"
+                onClick={() => setMenuOpen(open => !open)}
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                Menu ▾
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border rounded shadow-lg z-10">
+                  <button onClick={() => { setShowProfileModal(true); setMenuOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Edit Profile</button>
+                  <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Logout</button>
+                </div>
+              )}
             </div>
           </div>
         </header>
