@@ -34,6 +34,10 @@ export default function AdminCertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loadingCerts, setLoadingCerts] = useState(true);
   const [fetchError, setFetchError] = useState('');
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [totalCount, setTotalCount] = useState(0);
   // Filter state (placeholders for now)
   const [studentFilter, setStudentFilter] = useState('');
   const [sessionFilter, setSessionFilter] = useState('');
@@ -50,24 +54,26 @@ export default function AdminCertificatesPage() {
 
   useEffect(() => {
     if (role === 'admin') {
-      fetchCertificates();
+      fetchCertificates(page);
     }
     // eslint-disable-next-line
-  }, [role]);
+  }, [role, page]);
 
-  async function fetchCertificates() {
+  async function fetchCertificates(pageNum: number) {
     setLoadingCerts(true);
     setFetchError('');
-    // Adjust the select below to match your actual table/column names
-    const { data, error } = await supabase
+    const from = (pageNum - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error, count } = await supabase
       .from('certificates')
-      .select('id, title, created_at, status, students(id, name), sessions(id, name)')
-      .order('created_at', { ascending: false });
+      .select('id, title, created_at, status, students(id, name), sessions(id, name)', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to);
     if (error || !data) {
       setFetchError('Could not fetch certificates');
       setCertificates([]);
+      setTotalCount(0);
     } else {
-      // Map to flatten student/session
       setCertificates(
         data.map((cert: RawCertificate) => ({
           ...cert,
@@ -75,6 +81,7 @@ export default function AdminCertificatesPage() {
           session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
         }))
       );
+      setTotalCount(count || 0);
     }
     setLoadingCerts(false);
   }
@@ -105,7 +112,7 @@ export default function AdminCertificatesPage() {
     if (error) setEditError(error.message);
     else {
       setEditCert(null);
-      fetchCertificates();
+      fetchCertificates(page);
     }
     setEditLoading(false);
   }
@@ -123,7 +130,7 @@ export default function AdminCertificatesPage() {
     if (error) setRevokeError(error.message);
     else {
       setRevokeId(null);
-      fetchCertificates();
+      fetchCertificates(page);
     }
     setRevokeLoading(false);
   }
@@ -141,13 +148,15 @@ export default function AdminCertificatesPage() {
     if (error) setRegenError(error.message);
     else {
       setRegenId(null);
-      fetchCertificates();
+      fetchCertificates(page);
     }
     setRegenLoading(false);
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
+
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return (
     <DashboardLayout role="admin">
@@ -217,6 +226,25 @@ export default function AdminCertificatesPage() {
           </div>
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
       {editCert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
