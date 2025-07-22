@@ -19,6 +19,14 @@ interface Certificate {
   session?: { id: string; name: string };
 }
 
+interface RawCertificate {
+  id: string;
+  title?: string;
+  created_at?: string;
+  status?: string;
+  sessions?: { id: string; name: string }[];
+}
+
 export default function AdminStudentsPage() {
   const { role, loading, error } = useUserRole();
   const [students, setStudents] = useState<Student[]>([]);
@@ -67,7 +75,7 @@ export default function AdminStudentsPage() {
       setCertificates([]);
     } else {
       setCertificates(
-        data.map((cert: any) => ({
+        data.map((cert: RawCertificate) => ({
           ...cert,
           session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
         }))
