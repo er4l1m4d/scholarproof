@@ -1,6 +1,6 @@
 "use client";
 import DashboardLayout from '../../../components/DashboardLayout';
-import { useUserRole } from '@/utils/useUserRole';
+import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import toast from 'react-hot-toast';

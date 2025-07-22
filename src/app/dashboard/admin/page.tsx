@@ -1,5 +1,5 @@
 import DashboardLayout from '../../components/DashboardLayout';
-import { useUserRole } from '@/utils/useUserRole';
+import { useUserRole } from '@/app/hooks/useUserRole';
 
 export default function AdminDashboard() {
   const { role, loading, error } = useUserRole();
