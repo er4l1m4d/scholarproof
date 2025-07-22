@@ -1,4 +1,4 @@
-import DashboardLayout from '../../components/DashboardLayout';
+import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/utils/useUserRole';
 
 export default function AdminSessionsPage() {
