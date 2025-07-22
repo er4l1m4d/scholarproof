@@ -1,33 +1,36 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import DashboardLayout from '../../components/DashboardLayout';
-import CertificateCard from '../../components/CertificateCard';
-import { getStudentCertificates } from '@/utils/getStudentCertificates';
-import { supabase } from '../../supabaseClient';
 import Link from 'next/link';
+import { supabase } from '../../supabaseClient';
 
-type Certificate = {
+// Types for dashboard state
+type CertificateSummary = {
   id: string;
-  title?: string;
-  created_at?: string;
+  title: string;
+  created_at: string;
+  status: string;
   irys_url?: string;
-  revoked?: boolean;
-  sessions?: { id?: string; name?: string };
+  session?: { id: string; name: string };
+};
+
+type SessionSummary = {
+  id: string;
+  name: string;
+  date: string;
 };
 
 export default function StudentDashboard() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [sessionFilter, setSessionFilter] = useState<string>('all');
-  const [certificates, setCertificates] = useState<any[]>([]);
-  const [sessions, setSessions] = useState<any[]>([]); // Placeholder for upcoming sessions
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [certificates, setCertificates] = useState<CertificateSummary[]>([]);
+  const [sessions, setSessions] = useState<SessionSummary[]>([]); // Placeholder for upcoming sessions
   const [name, setName] = useState<string | null>(null);
 
   // Dynamically extract unique sessions from certificates
   const sessionOptions = useMemo(() => {
     const sessions = certificates
-      .map(cert => cert.sessions)
+      .map(cert => cert.session)
       .filter((s): s is { id: string; name: string } => !!s && !!s.id && !!s.name)
       .map(s => ({ id: s.id, name: s.name }));
     const unique = Array.from(new Map(sessions.map(s => [s.id, s])).values());
@@ -41,11 +44,16 @@ export default function StudentDashboard() {
       if (user) {
         const { data } = await supabase
           .from('certificates')
-          .select('id, title, created_at, status, irys_url')
+          .select('id, title, created_at, status, irys_url, session:sessions(id, name)')
           .eq('student_id', user.id)
           .order('created_at', { ascending: false })
           .limit(3);
-        setCertificates(data || []);
+        // Fix: session may be an array, but we want a single object
+        const mapped = (data || []).map((cert: any) => ({
+          ...cert,
+          session: Array.isArray(cert.session) ? cert.session[0] : cert.session
+        }));
+        setCertificates(mapped);
       }
     }
     fetchCertificates();
@@ -79,7 +87,7 @@ export default function StudentDashboard() {
   const displayedCertificates = useMemo(() => {
     let filtered = certificates;
     if (sessionFilter !== 'all') {
-      filtered = filtered.filter(cert => cert.sessions?.id === sessionFilter);
+      filtered = filtered.filter(cert => cert.session?.id === sessionFilter);
     }
     filtered = filtered.slice().sort((a, b) => {
       const dateA = new Date(a.created_at ?? '').getTime();
@@ -186,17 +194,24 @@ export default function StudentDashboard() {
             </select>
           </div>
         </div>
-        {loading && <div className="text-center text-gray-500">Loading certificates...</div>}
-        {error && <div className="text-center text-red-500">{error}</div>}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {displayedCertificates.length === 0 ? (
-              <div className="col-span-full text-center text-gray-400">No certificates found.</div>
-            ) : (
-              displayedCertificates.map((cert) => (
-                <CertificateCard key={cert.id} cert={cert} />
-              ))
-            )}
+        {displayedCertificates.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400">No certificates found.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {displayedCertificates.map(cert => (
+              <div key={cert.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
+                <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
+                <div className="text-xs text-gray-500 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                <div className="text-sm mb-2">Status: <span className="font-medium">{cert.status || 'Active'}</span></div>
+                {/* Verification/Share Widget */}
+                <button
+                  className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium"
+                  onClick={() => handleCopyLink(cert.id)}
+                >
+                  Copy Verification Link
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>
