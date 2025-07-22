@@ -31,6 +31,10 @@ export default function AdminStudentsPage() {
   const { role, loading, error } = useUserRole();
   const [students, setStudents] = useState<Student[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(true);
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [totalCount, setTotalCount] = useState(0);
   const [fetchError, setFetchError] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -39,23 +43,28 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     if (role === 'admin') {
-      fetchStudents();
+      fetchStudents(page);
     }
     // eslint-disable-next-line
-  }, [role]);
+  }, [role, page]);
 
-  async function fetchStudents() {
+  async function fetchStudents(pageNum: number) {
     setLoadingStudents(true);
     setFetchError('');
-    const { data, error } = await supabase
+    const from = (pageNum - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error, count } = await supabase
       .from('users')
-      .select('id, name, email, role')
-      .order('name', { ascending: true });
+      .select('id, name, email, role', { count: 'exact' })
+      .order('name', { ascending: true })
+      .range(from, to);
     if (error || !data) {
       setFetchError('Could not fetch students');
       setStudents([]);
+      setTotalCount(0);
     } else {
       setStudents(data.filter((u: Student) => u.role === 'student'));
+      setTotalCount(count || 0);
     }
     setLoadingStudents(false);
   }
@@ -93,6 +102,8 @@ export default function AdminStudentsPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
 
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
   return (
     <DashboardLayout role="admin">
       <h2 className="text-2xl font-bold text-blue-800 mb-6">Students</h2>
@@ -128,6 +139,26 @@ export default function AdminStudentsPage() {
           </div>
         )}
       </div>
+      {/* Pagination controls */}
+      {totalCount > 0 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
       {/* Student Details Modal */}
       {selectedStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
