@@ -18,6 +18,10 @@ export default function AdminSessionsPage() {
   const { role, loading, error } = useUserRole();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [totalCount, setTotalCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: '', start_date: '', end_date: '', status: 'Active' });
   const [formLoading, setFormLoading] = useState(false);
@@ -29,15 +33,27 @@ export default function AdminSessionsPage() {
 
   useEffect(() => {
     if (role === 'admin') {
-      fetchSessions();
+      fetchSessions(page);
     }
     // eslint-disable-next-line
-  }, [role]);
+  }, [role, page]);
 
-  async function fetchSessions() {
+  async function fetchSessions(pageNum: number) {
     setLoadingSessions(true);
-    const { data, error } = await supabase.from('sessions').select('*').order('start_date', { ascending: false });
-    if (!error && data) setSessions(data);
+    const from = (pageNum - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error, count } = await supabase
+      .from('sessions')
+      .select('*', { count: 'exact' })
+      .order('start_date', { ascending: false })
+      .range(from, to);
+    if (!error && data) {
+      setSessions(data);
+      setTotalCount(count || 0);
+    } else {
+      setSessions([]);
+      setTotalCount(0);
+    }
     setLoadingSessions(false);
   }
 
@@ -83,7 +99,7 @@ export default function AdminSessionsPage() {
         setShowModal(false);
         setEditId(null);
         setForm({ name: '', start_date: '', end_date: '', status: 'Active' });
-        fetchSessions();
+        fetchSessions(page); // Re-fetch current page after edit
       }
     } else {
       // Create
@@ -98,7 +114,7 @@ export default function AdminSessionsPage() {
       } else {
         setShowModal(false);
         setForm({ name: '', start_date: '', end_date: '', status: 'Active' });
-        fetchSessions();
+        fetchSessions(page); // Re-fetch current page after create
       }
     }
     setFormLoading(false);
@@ -118,13 +134,16 @@ export default function AdminSessionsPage() {
       setDeleteError(error.message);
     } else {
       setDeleteId(null);
-      fetchSessions();
+      fetchSessions(page); // Re-fetch current page after delete
     }
     setDeleteLoading(false);
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
+
+  // Pagination controls
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return (
     <DashboardLayout role="admin">
@@ -267,6 +286,25 @@ export default function AdminSessionsPage() {
           </div>
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </DashboardLayout>
   );
 } 
