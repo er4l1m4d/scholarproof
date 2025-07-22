@@ -1,4 +1,6 @@
-import DashboardLayout from '@/app/components/DashboardLayout';
+"use client";
+
+import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 
 export default function AdminCertificatesPage() {

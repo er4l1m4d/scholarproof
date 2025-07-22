@@ -1,3 +1,4 @@
+"use client";
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 

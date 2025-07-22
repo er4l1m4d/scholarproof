@@ -1,16 +1,11 @@
+"use client";
 import DashboardLayout from '../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 
 export default function LecturerDashboard() {
   const { role, loading, error } = useUserRole();
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-  if (error || role !== 'lecturer') {
-    return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
-  }
-
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (error || role !== 'lecturer') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
   return (
     <DashboardLayout role="lecturer">
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
