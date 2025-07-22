@@ -29,6 +29,9 @@ interface EditForm {
   status: string;
 }
 
+interface SessionOption { id: string; name: string; }
+interface StudentOption { id: string; name: string; }
+
 export default function AdminCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -51,6 +54,12 @@ export default function AdminCertificatesPage() {
   const [regenId, setRegenId] = useState<string | null>(null);
   const [regenLoading, setRegenLoading] = useState(false);
   const [regenError, setRegenError] = useState('');
+  const [showGenModal, setShowGenModal] = useState(false);
+  const [sessionsList, setSessionsList] = useState<SessionOption[]>([]);
+  const [studentsList, setStudentsList] = useState<StudentOption[]>([]);
+  const [genForm, setGenForm] = useState({ sessionId: '', studentId: '', title: '' });
+  const [genLoading, setGenLoading] = useState(false);
+  const [genError, setGenError] = useState('');
 
   useEffect(() => {
     if (role === 'admin') {
@@ -58,6 +67,13 @@ export default function AdminCertificatesPage() {
     }
     // eslint-disable-next-line
   }, [role, page]);
+
+  useEffect(() => {
+    if (role === 'admin' && showGenModal) {
+      fetchSessionsList();
+    }
+    // eslint-disable-next-line
+  }, [role, showGenModal]);
 
   async function fetchCertificates(pageNum: number) {
     setLoadingCerts(true);
@@ -84,6 +100,19 @@ export default function AdminCertificatesPage() {
       setTotalCount(count || 0);
     }
     setLoadingCerts(false);
+  }
+
+  async function fetchSessionsList() {
+    const { data, error } = await supabase.from('sessions').select('id, name').order('name');
+    if (!error && data) setSessionsList(data);
+    else setSessionsList([]);
+  }
+
+  async function fetchStudentsList(sessionId: string) {
+    // Optionally, filter students by session if you have a join table; otherwise, fetch all students
+    const { data, error } = await supabase.from('users').select('id, name').eq('role', 'student').order('name');
+    if (!error && data) setStudentsList(data);
+    else setStudentsList([]);
   }
 
   // Filter logic (simple client-side for now)
@@ -153,6 +182,42 @@ export default function AdminCertificatesPage() {
     setRegenLoading(false);
   }
 
+  function openGenModal() {
+    setShowGenModal(true);
+    setGenForm({ sessionId: '', studentId: '', title: '' });
+    setGenError('');
+    setStudentsList([]);
+  }
+
+  async function handleGenSessionChange(sessionId: string) {
+    setGenForm(f => ({ ...f, sessionId, studentId: '' }));
+    await fetchStudentsList(sessionId);
+  }
+
+  async function handleGenerateCert(e: React.FormEvent) {
+    e.preventDefault();
+    setGenLoading(true);
+    setGenError('');
+    if (!genForm.sessionId || !genForm.studentId || !genForm.title) {
+      setGenError('All fields are required.');
+      setGenLoading(false);
+      return;
+    }
+    const { error } = await supabase.from('certificates').insert({
+      session_id: genForm.sessionId,
+      student_id: genForm.studentId,
+      title: genForm.title,
+      status: 'Active',
+    });
+    if (error) setGenError(error.message);
+    else {
+      setShowGenModal(false);
+      setGenForm({ sessionId: '', studentId: '', title: '' });
+      fetchCertificates(page);
+    }
+    setGenLoading(false);
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
 
@@ -186,6 +251,7 @@ export default function AdminCertificatesPage() {
           />
         </div>
       </div>
+      <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4" onClick={openGenModal}>+ Generate Certificate</button>
       <div className="bg-white rounded shadow p-4">
         {loadingCerts ? (
           <div className="text-center py-8 text-gray-500">Loading certificates...</div>
@@ -288,6 +354,36 @@ export default function AdminCertificatesPage() {
               <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={() => setRegenId(null)} disabled={regenLoading}>Cancel</button>
               <button className="px-4 py-2 rounded bg-yellow-600 hover:bg-yellow-700 text-white font-medium" onClick={handleRegenCert} disabled={regenLoading}>{regenLoading ? 'Regenerating...' : 'Regenerate'}</button>
             </div>
+          </div>
+        </div>
+      )}
+      {showGenModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowGenModal(false)} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800">Generate Certificate</h3>
+            <form onSubmit={handleGenerateCert} className="space-y-4">
+              <div>
+                <label className="block mb-1 font-medium">Session</label>
+                <select className="w-full px-3 py-2 border rounded" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
+                  <option value="">Select session</option>
+                  {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Student</label>
+                <select className="w-full px-3 py-2 border rounded" value={genForm.studentId} onChange={e => setGenForm(f => ({ ...f, studentId: e.target.value }))} required disabled={!genForm.sessionId}>
+                  <option value="">Select student</option>
+                  {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Certificate Title</label>
+                <input type="text" className="w-full px-3 py-2 border rounded" value={genForm.title} onChange={e => setGenForm(f => ({ ...f, title: e.target.value }))} required />
+              </div>
+              {genError && <div className="text-red-600 text-sm">{genError}</div>}
+              <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={genLoading}>{genLoading ? 'Generating...' : 'Generate Certificate'}</button>
+            </form>
           </div>
         </div>
       )}
