@@ -4,6 +4,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import CertificateCard from '../../components/CertificateCard';
 import { getStudentCertificates } from '@/utils/getStudentCertificates';
 import { supabase } from '../../supabaseClient';
+import Link from 'next/link';
 
 type Certificate = {
   id: string;
@@ -17,7 +18,8 @@ type Certificate = {
 export default function StudentDashboard() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [sessionFilter, setSessionFilter] = useState<string>('all');
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]); // Placeholder for upcoming sessions
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
@@ -32,22 +34,34 @@ export default function StudentDashboard() {
     return [{ id: 'all', name: 'All Sessions' }, ...unique];
   }, [certificates]);
 
+  // Fetch certificates (top 3)
   useEffect(() => {
     async function fetchCertificates() {
-      try {
-        setLoading(true);
-        setError(null);
-        // TODO: Replace with real student ID from auth/session
-        const studentId = 'demo-student-id';
-        const data = await getStudentCertificates(studentId);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('certificates')
+          .select('id, title, created_at, status, irys_url')
+          .eq('student_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(3);
         setCertificates(data || []);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch certificates');
-      } finally {
-        setLoading(false);
       }
     }
     fetchCertificates();
+  }, []);
+
+  // Fetch upcoming sessions (placeholder logic)
+  useEffect(() => {
+    async function fetchSessions() {
+      // TODO: Replace with real logic if you have a student_sessions table or similar
+      setSessions([
+        { id: '1', name: 'Session 1', date: '2024-07-01' },
+        { id: '2', name: 'Session 2', date: '2024-07-10' },
+        { id: '3', name: 'Session 3', date: '2024-07-20' },
+      ]);
+    }
+    fetchSessions();
   }, []);
 
   useEffect(() => {
@@ -75,6 +89,17 @@ export default function StudentDashboard() {
     return filtered;
   }, [certificates, sortOrder, sessionFilter]);
 
+  function getVerificationLink(certId: string) {
+    // Replace with your real public certificate URL pattern
+    return `${window.location.origin}/certificates/${certId}`;
+  }
+
+  function handleCopyLink(certId: string) {
+    const link = getVerificationLink(certId);
+    navigator.clipboard.writeText(link);
+    alert('Verification link copied!');
+  }
+
   return (
     <DashboardLayout role="student">
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center mx-auto mb-8">
@@ -82,6 +107,50 @@ export default function StudentDashboard() {
           Welcome, {name || 'student'}! 🎓
         </h1>
         <p className="text-gray-600 dark:text-gray-300">This is your student dashboard.</p>
+      </div>
+      {/* My Certificates Summary */}
+      <div className="mb-8 w-full max-w-3xl mx-auto">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">My Certificates</h2>
+          <Link href="/dashboard/student/certificates" className="text-blue-700 hover:underline font-medium">View All</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {certificates.length === 0 ? (
+            <div className="col-span-3 text-gray-400">No certificates yet.</div>
+          ) : (
+            certificates.map(cert => (
+              <div key={cert.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
+                <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
+                <div className="text-xs text-gray-500 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                <div className="text-sm mb-2">Status: <span className="font-medium">{cert.status || 'Active'}</span></div>
+                {/* Verification/Share Widget */}
+                <button
+                  className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium"
+                  onClick={() => handleCopyLink(cert.id)}
+                >
+                  Copy Verification Link
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+      {/* Upcoming Sessions */}
+      <div className="mb-8 w-full max-w-3xl mx-auto">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Upcoming Sessions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {sessions.length === 0 ? (
+            <div className="col-span-3 text-gray-400">No upcoming sessions.</div>
+          ) : (
+            sessions.map(s => (
+              <div key={s.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
+                <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{s.name}</div>
+                <div className="text-xs text-gray-500 mb-2">{s.date}</div>
+                <button className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mt-2">Details</button>
+              </div>
+            ))
+          )}
+        </div>
       </div>
       <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
