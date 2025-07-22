@@ -45,7 +45,6 @@ export default function AdminStudentsPage() {
     if (role === 'admin') {
       fetchStudents(page);
     }
-    // eslint-disable-next-line
   }, [role, page]);
 
   async function fetchStudents(pageNum: number) {

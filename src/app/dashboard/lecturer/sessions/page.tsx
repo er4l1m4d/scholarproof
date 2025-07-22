@@ -26,7 +26,6 @@ export default function LecturerSessionsPage() {
     if (role === 'lecturer') {
       fetchLecturerSessions(page);
     }
-    // eslint-disable-next-line
   }, [role, page]);
 
   async function fetchLecturerSessions(pageNum: number) {

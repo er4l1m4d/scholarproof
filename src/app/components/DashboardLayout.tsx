@@ -10,7 +10,6 @@ import { HiOutlineHome, HiOutlineCalendar, HiOutlineDocumentText, HiOutlineUsers
 interface DashboardLayoutProps {
   role: 'admin' | 'lecturer' | 'student';
   children: React.ReactNode;
-  name?: string;
   setName?: (name: string) => void;
 }
 
@@ -43,7 +42,7 @@ const icons = {
   'Invite Codes': <HiOutlineKey className="w-5 h-5" />,
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, name, setName }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setName }) => {
   const pathname = usePathname();
   const tabs = sidebarTabs[role];
   const router = useRouter();
@@ -79,7 +78,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, name,
     if (showProfileModal) {
       fetchProfile();
     }
-    // eslint-disable-next-line
   }, [showProfileModal]);
 
   async function fetchProfile() {

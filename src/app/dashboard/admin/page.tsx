@@ -4,12 +4,20 @@ import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../supabaseClient';
 import { getSessionSummaries } from '@/app/utils/getSessionSummaries';
+import { getStudentSummaries } from '@/app/utils/getStudentSummaries';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 interface SessionSummary {
   id: string;
   name: string;
   created_at: string;
+  certCount: number;
+}
+
+interface StudentSummary {
+  id: string;
+  full_name: string;
+  email: string;
   certCount: number;
 }
 
@@ -20,6 +28,9 @@ export default function AdminDashboard() {
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('all');
+  const [studentSummaries, setStudentSummaries] = useState<StudentSummary[]>([]);
+  const [studentSummaryLoading, setStudentSummaryLoading] = useState(true);
+  const [studentSummaryError, setStudentSummaryError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchName() {
@@ -52,11 +63,31 @@ export default function AdminDashboard() {
     fetchSummaries();
   }, []);
 
+  useEffect(() => {
+    async function fetchStudentSummaries() {
+      setStudentSummaryLoading(true);
+      setStudentSummaryError(null);
+      try {
+        const data = await getStudentSummaries();
+        setStudentSummaries(data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setStudentSummaryError(err.message);
+        } else {
+          setStudentSummaryError('Failed to fetch student summaries');
+        }
+      } finally {
+        setStudentSummaryLoading(false);
+      }
+    }
+    fetchStudentSummaries();
+  }, []);
+
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-900 dark:text-gray-100">Loading...</div>;
   if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600 dark:text-red-400">Unauthorized</div>;
 
   return (
-    <DashboardLayout role="admin" name={name || undefined} setName={setName}>
+    <DashboardLayout role="admin" setName={setName}>
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md text-center mb-8">
         <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-2">
           {name ? `Welcome, ${name}! 🛡️` : 'Welcome! Please update your profile name.'}
@@ -121,6 +152,53 @@ export default function AdminDashboard() {
                   <YAxis allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="certCount" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </div>
+      {/* Student Summary Section */}
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md mt-8">
+        <h2 className="text-xl font-bold text-green-700 dark:text-green-300 mb-4 text-left">Student Summary</h2>
+        {studentSummaryLoading ? (
+          <div className="text-gray-500 dark:text-gray-300">Loading student summary...</div>
+        ) : studentSummaryError ? (
+          <div className="text-red-600 dark:text-red-400">{studentSummaryError}</div>
+        ) : studentSummaries.length === 0 ? (
+          <div className="text-gray-400 dark:text-gray-500">No students found.</div>
+        ) : (
+          <>
+            {/* Table */}
+            <div className="overflow-x-auto mb-8">
+              <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg">
+                <thead>
+                  <tr className="bg-gray-100 dark:bg-gray-800">
+                    <th className="px-4 py-2 text-left">Student Name</th>
+                    <th className="px-4 py-2 text-left">Email</th>
+                    <th className="px-4 py-2 text-left">Certificates Issued</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentSummaries.map((s) => (
+                    <tr key={s.id} className="border-t border-gray-200 dark:border-gray-700">
+                      <td className="px-4 py-2">{s.full_name}</td>
+                      <td className="px-4 py-2">{s.email}</td>
+                      <td className="px-4 py-2">{s.certCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Bar Chart */}
+            <div className="w-full h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={studentSummaries} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="full_name" tick={{ fontSize: 12 }} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="certCount" fill="#059669" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

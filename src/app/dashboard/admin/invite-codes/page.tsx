@@ -24,7 +24,6 @@ export default function InviteCodesPage() {
   // Fetch invite codes
   useEffect(() => {
     fetchCodes();
-    // eslint-disable-next-line
   }, []);
 
   async function fetchCodes() {

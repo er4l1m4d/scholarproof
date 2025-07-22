@@ -65,14 +65,12 @@ export default function AdminCertificatesPage() {
     if (role === 'admin') {
       fetchCertificates(page);
     }
-    // eslint-disable-next-line
   }, [role, page]);
 
   useEffect(() => {
     if (role === 'admin' && showGenModal) {
       fetchSessionsList();
     }
-    // eslint-disable-next-line
   }, [role, showGenModal]);
 
   async function fetchCertificates(pageNum: number) {

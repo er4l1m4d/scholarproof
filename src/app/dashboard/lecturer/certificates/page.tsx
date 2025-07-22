@@ -32,10 +32,6 @@ interface RawCertificate {
 interface SessionOption { id: string; name: string; }
 interface StudentOption { id: string; name: string; }
 
-interface LecturerSessionWithSession {
-  sessions: { id: string; name: string }[];
-}
-
 export default function LecturerCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -69,14 +65,12 @@ export default function LecturerCertificatesPage() {
     if (role === 'lecturer') {
       fetchLecturerCertificates(page);
     }
-    // eslint-disable-next-line
   }, [role, page]);
 
   useEffect(() => {
     if (role === 'lecturer' && showGenModal) {
       fetchSessionsList();
     }
-    // eslint-disable-next-line
   }, [role, showGenModal]);
 
   async function fetchLecturerCertificates(pageNum: number) {

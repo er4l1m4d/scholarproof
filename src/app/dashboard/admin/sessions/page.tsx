@@ -42,7 +42,6 @@ export default function AdminSessionsPage() {
     if (role === 'admin') {
       fetchSessions(page);
     }
-    // eslint-disable-next-line
   }, [role, page]);
 
   async function fetchSessions(pageNum: number) {
