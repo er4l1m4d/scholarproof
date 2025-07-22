@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../supabaseClient';
 
 interface DashboardLayoutProps {
   role: 'admin' | 'lecturer';
@@ -27,6 +29,12 @@ const sidebarTabs = {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => {
   const pathname = usePathname();
   const tabs = sidebarTabs[role];
+  const router = useRouter();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push('/login');
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-50 font-sans">
@@ -74,7 +82,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
               <button className="px-3 py-1 rounded hover:bg-gray-100 transition font-medium">Menu ▾</button>
               <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-10">
                 <Link href="#" className="block px-4 py-2 hover:bg-gray-100">Edit Profile</Link>
-                <Link href="/logout" className="block px-4 py-2 hover:bg-gray-100">Logout</Link>
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
               </div>
             </div>
           </div>
