@@ -33,6 +33,10 @@ export default function LecturerCertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loadingCerts, setLoadingCerts] = useState(true);
   const [fetchError, setFetchError] = useState('');
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [totalCount, setTotalCount] = useState(0);
   // Filter state (placeholders for now)
   const [studentFilter, setStudentFilter] = useState('');
   const [sessionFilter, setSessionFilter] = useState('');
@@ -49,12 +53,12 @@ export default function LecturerCertificatesPage() {
 
   useEffect(() => {
     if (role === 'lecturer') {
-      fetchLecturerCertificates();
+      fetchLecturerCertificates(page);
     }
     // eslint-disable-next-line
-  }, [role]);
+  }, [role, page]);
 
-  async function fetchLecturerCertificates() {
+  async function fetchLecturerCertificates(pageNum: number) {
     setLoadingCerts(true);
     setFetchError('');
     // Get current user
@@ -77,18 +81,23 @@ export default function LecturerCertificatesPage() {
     const sessionIds = lecturerSessions.map((ls: { session_id: string }) => ls.session_id);
     if (sessionIds.length === 0) {
       setCertificates([]);
+      setTotalCount(0);
       setLoadingCerts(false);
       return;
     }
     // Fetch certificates for these sessions
-    const { data, error: certError } = await supabase
+    const from = (pageNum - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error: certError, count } = await supabase
       .from('certificates')
-      .select('id, title, created_at, status, students(id, name), sessions(id, name)')
+      .select('id, title, created_at, status, students(id, name), sessions(id, name)', { count: 'exact' })
       .in('session_id', sessionIds)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
     if (certError || !data) {
       setFetchError('Could not fetch certificates');
       setCertificates([]);
+      setTotalCount(0);
     } else {
       setCertificates(
         data.map((cert: RawCertificate) => ({
@@ -97,6 +106,7 @@ export default function LecturerCertificatesPage() {
           session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
         }))
       );
+      setTotalCount(count || 0);
     }
     setLoadingCerts(false);
   }
@@ -127,7 +137,7 @@ export default function LecturerCertificatesPage() {
     if (error) setEditError(error.message);
     else {
       setEditCert(null);
-      fetchLecturerCertificates();
+      fetchLecturerCertificates(page);
     }
     setEditLoading(false);
   }
@@ -145,7 +155,7 @@ export default function LecturerCertificatesPage() {
     if (error) setRevokeError(error.message);
     else {
       setRevokeId(null);
-      fetchLecturerCertificates();
+      fetchLecturerCertificates(page);
     }
     setRevokeLoading(false);
   }
@@ -163,13 +173,15 @@ export default function LecturerCertificatesPage() {
     if (error) setRegenError(error.message);
     else {
       setRegenId(null);
-      fetchLecturerCertificates();
+      fetchLecturerCertificates(page);
     }
     setRegenLoading(false);
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'lecturer') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
+
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return (
     <DashboardLayout role="lecturer">
@@ -239,6 +251,25 @@ export default function LecturerCertificatesPage() {
           </div>
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
       {editCert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
