@@ -20,6 +20,8 @@ type SessionSummary = {
   date: string;
 };
 
+type RawCertificate = Omit<CertificateSummary, 'session'> & { session?: { id: string; name: string }[] | { id: string; name: string } };
+
 export default function StudentDashboard() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [sessionFilter, setSessionFilter] = useState<string>('all');
@@ -48,16 +50,15 @@ export default function StudentDashboard() {
           .eq('student_id', user.id)
           .order('created_at', { ascending: false })
           .limit(3);
-        // Fix: session may be an array, but we want a single object
-        const mapped = (data || []).map((cert: any) => ({
-          ...cert,
-          session: Array.isArray(cert.session) ? cert.session[0] : cert.session
-        }));
-        setCertificates(mapped);
-      }
+      const mapped = (data || []).map((cert: RawCertificate) => ({
+        ...cert,
+        session: Array.isArray(cert.session) ? cert.session[0] : cert.session
+      }));
+      setCertificates(mapped);
     }
-    fetchCertificates();
-  }, []);
+  }
+  fetchCertificates();
+}, []);
 
   // Fetch upcoming sessions (placeholder logic)
   useEffect(() => {
