@@ -32,6 +32,10 @@ interface RawCertificate {
 interface SessionOption { id: string; name: string; }
 interface StudentOption { id: string; name: string; }
 
+interface LecturerSessionWithSession {
+  sessions: { id: string; name: string }[];
+}
+
 export default function LecturerCertificatesPage() {
   const { role, loading, error } = useUserRole();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -140,7 +144,11 @@ export default function LecturerCertificatesPage() {
       .select('session_id, sessions(id, name)')
       .eq('user_id', user.id);
     if (!error && lecturerSessions) {
-      setSessionsList(lecturerSessions.map((ls: any) => ls.sessions));
+      setSessionsList(
+        lecturerSessions
+          .map((ls: { sessions: { id: string; name: string }[] }) => (ls.sessions && ls.sessions.length > 0 ? ls.sessions[0] : undefined))
+          .filter((s): s is { id: string; name: string } => !!s)
+      );
     } else {
       setSessionsList([]);
     }
