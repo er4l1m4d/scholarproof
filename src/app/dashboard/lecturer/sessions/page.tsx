@@ -45,7 +45,7 @@ export default function LecturerSessionsPage() {
       setLoadingSessions(false);
       return;
     }
-    const sessionIds = lecturerSessions.map((ls: any) => ls.session_id);
+    const sessionIds = lecturerSessions.map((ls: { session_id: string }) => ls.session_id);
     if (sessionIds.length === 0) {
       setSessions([]);
       setLoadingSessions(false);
