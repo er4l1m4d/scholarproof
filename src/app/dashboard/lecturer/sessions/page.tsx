@@ -17,15 +17,19 @@ export default function LecturerSessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [fetchError, setFetchError] = useState('');
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     if (role === 'lecturer') {
-      fetchLecturerSessions();
+      fetchLecturerSessions(page);
     }
     // eslint-disable-next-line
-  }, [role]);
+  }, [role, page]);
 
-  async function fetchLecturerSessions() {
+  async function fetchLecturerSessions(pageNum: number) {
     setLoadingSessions(true);
     setFetchError('');
     // Get current user
@@ -48,23 +52,31 @@ export default function LecturerSessionsPage() {
     const sessionIds = lecturerSessions.map((ls: { session_id: string }) => ls.session_id);
     if (sessionIds.length === 0) {
       setSessions([]);
+      setTotalCount(0);
       setLoadingSessions(false);
       return;
     }
     // Fetch session details
-    const { data: sessionData, error: sError } = await supabase
+    const from = (pageNum - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const { data: sessionData, error: sError, count } = await supabase
       .from('sessions')
-      .select('*')
+      .select('*', { count: 'exact' })
       .in('id', sessionIds)
-      .order('start_date', { ascending: false });
+      .order('start_date', { ascending: false })
+      .range(from, to);
     if (sError || !sessionData) {
       setFetchError('Could not fetch session details');
       setSessions([]);
+      setTotalCount(0);
     } else {
       setSessions(sessionData);
+      setTotalCount(count || 0);
     }
     setLoadingSessions(false);
   }
+
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || role !== 'lecturer') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
@@ -101,6 +113,25 @@ export default function LecturerSessionsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-4">
+            <button
+              className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </button>
+            <span>Page {page} of {totalPages}</span>
+            <button
+              className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>
