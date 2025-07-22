@@ -8,7 +8,7 @@ import { supabase } from '../supabaseClient';
 import { HiOutlineHome, HiOutlineCalendar, HiOutlineDocumentText, HiOutlineUsers, HiOutlineKey } from 'react-icons/hi2';
 
 interface DashboardLayoutProps {
-  role: 'admin' | 'lecturer';
+  role: 'admin' | 'lecturer' | 'student';
   children: React.ReactNode;
 }
 
@@ -24,6 +24,10 @@ const sidebarTabs = {
     { name: 'Dashboard', href: '/dashboard/lecturer' },
     { name: 'My Sessions', href: '/dashboard/lecturer/sessions' },
     { name: 'Certificates', href: '/dashboard/lecturer/certificates' },
+  ],
+  student: [
+    { name: 'Dashboard', href: '/dashboard/student' },
+    { name: 'Certificates', href: '/dashboard/student/certificates' },
   ],
 };
 

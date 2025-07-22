@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
+import DashboardLayout from '../../components/DashboardLayout';
 import CertificateCard from '../../components/CertificateCard';
 import { getStudentCertificates } from '@/utils/getStudentCertificates';
 import { supabase } from '../../supabaseClient';
@@ -75,8 +76,8 @@ export default function StudentDashboard() {
   }, [certificates, sortOrder, sessionFilter]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 font-sans">
-      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center">
+    <DashboardLayout role="student">
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center mx-auto mb-8">
         <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-2">
           Welcome, {name || 'student'}! 🎓
         </h1>
@@ -130,6 +131,6 @@ export default function StudentDashboard() {
           </div>
         )}
       </div>
-    </main>
+    </DashboardLayout>
   );
 } 
