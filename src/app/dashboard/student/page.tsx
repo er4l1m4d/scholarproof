@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import CertificateCard from '../../components/CertificateCard';
-import { getStudentCertificates } from '../../../utils/getStudentCertificates';
+import { getStudentCertificates } from '@/utils/getStudentCertificates';
+import { supabase } from '../../supabaseClient';
 
 type Certificate = {
   id: string;
@@ -18,6 +19,7 @@ export default function StudentDashboard() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
   // Dynamically extract unique sessions from certificates
   const sessionOptions = useMemo(() => {
@@ -47,6 +49,17 @@ export default function StudentDashboard() {
     fetchCertificates();
   }, []);
 
+  useEffect(() => {
+    async function fetchName() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('users').select('name').eq('id', user.id).single();
+        setName(data?.name || null);
+      }
+    }
+    fetchName();
+  }, []);
+
   // Filter and sort certificates
   const displayedCertificates = useMemo(() => {
     let filtered = certificates;
@@ -62,7 +75,13 @@ export default function StudentDashboard() {
   }, [certificates, sortOrder, sessionFilter]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-50 font-sans p-4">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 font-sans">
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-2">
+          Welcome, {name || 'student'}! 🎓
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300">This is your student dashboard.</p>
+      </div>
       <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
           <div>
