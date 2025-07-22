@@ -113,7 +113,7 @@ export default function StudentDashboard() {
     <DashboardLayout role="student" name={name || undefined} setName={setName}>
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center mx-auto mb-8">
         <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-2">
-          {name ? `Welcome, ${name}!` : 'Welcome! Please update your profile name.'}
+          {name ? `Welcome, ${name}! 🎓` : 'Welcome! Please update your profile name.'}
         </h1>
         <p className="text-gray-600 dark:text-gray-300">This is your student dashboard.</p>
       </div>
