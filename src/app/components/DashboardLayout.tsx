@@ -112,14 +112,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
       {/* Sidebar (responsive) */}
       <aside
         className={`
-          fixed z-40 top-0 left-0 h-full bg-white border-r flex flex-col py-6 px-4 transition-all duration-200
+          fixed z-40 top-0 left-0 h-full bg-white dark:bg-gray-900 border-r flex flex-col py-6 px-4 transition-all duration-200
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           w-64
         `}
         style={{ minWidth: 256 }}
       >
         <div className="mb-8 flex items-center justify-between">
-          <span className="text-xl font-bold text-blue-800">ScholarProof</span>
+          <span className="text-xl font-bold text-blue-800 dark:text-blue-200">ScholarProof</span>
           {/* Close button (all screens) */}
           <button
             className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto"
@@ -137,11 +137,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
                   href={tab.href}
                   className={`flex items-center gap-3 px-4 py-2 rounded transition font-medium ${
                     pathname === tab.href
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
-                  {icons[tab.name as keyof typeof icons]}
+                  {React.cloneElement(icons[tab.name as keyof typeof icons], { className: 'w-5 h-5 text-gray-900 dark:text-gray-100' })}
                   <span>{tab.name}</span>
                 </Link>
               </li>
@@ -152,13 +152,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
 
       {/* Overlay for drawer */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-30 bg-black bg-opacity-30" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 z-30 bg-black bg-opacity-30 dark:bg-opacity-60" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Main Area */}
       <div className="flex-1 flex flex-col md:ml-0" style={{ marginLeft: 0 }}>
         {/* Topbar */}
-        <header className="h-16 bg-white border-b flex items-center justify-between px-8">
+        <header className="h-16 bg-white dark:bg-gray-900 border-b flex items-center justify-between px-8">
           <div className="flex items-center gap-4">
             {/* Hamburger for mobile */}
             <button
@@ -174,15 +174,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
           </div>
           <div className="flex items-center gap-4">
             {/* Placeholder avatar */}
-            <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
+            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-bold">
               <span>{role.charAt(0).toUpperCase()}</span>
             </div>
             {/* Menu */}
             <div className="relative group">
-              <button className="px-3 py-1 rounded hover:bg-gray-100 transition font-medium">Menu ▾</button>
-              <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-10">
-                <button onClick={() => setShowProfileModal(true)} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Edit Profile</button>
-                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
+              <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-900 dark:text-gray-100">Menu ▾</button>
+              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-10">
+                <button onClick={() => setShowProfileModal(true)} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Edit Profile</button>
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100">Logout</button>
               </div>
             </div>
           </div>
@@ -194,13 +194,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children }) => 
       </div>
       {showProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowProfileModal(false)} aria-label="Close">&times;</button>
             <h3 className="text-xl font-bold mb-4 text-blue-800">Edit Profile</h3>
             <form onSubmit={handleProfileSave} className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Name</label>
-                <input type="text" className="w-full px-3 py-2 border rounded" value={profileName} onChange={e => setProfileName(e.target.value)} required />
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Name</label>
+                <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={profileName} onChange={e => setProfileName(e.target.value)} required />
               </div>
               {profileError && <div className="text-red-600 text-sm">{profileError}</div>}
               {profileSuccess && <div className="text-green-600 text-sm">{profileSuccess}</div>}
