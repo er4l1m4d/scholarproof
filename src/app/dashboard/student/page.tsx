@@ -60,15 +60,25 @@ export default function StudentDashboard() {
   fetchCertificates();
 }, []);
 
-  // Fetch upcoming sessions (placeholder logic)
+  // Fetch upcoming sessions (only those created by admin and with status 'Active')
   useEffect(() => {
     async function fetchSessions() {
-      // TODO: Replace with real logic if you have a student_sessions table or similar
-      setSessions([
-        { id: '1', name: 'Session 1', date: '2024-07-01' },
-        { id: '2', name: 'Session 2', date: '2024-07-10' },
-        { id: '3', name: 'Session 3', date: '2024-07-20' },
-      ]);
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('id, name, start_date')
+        .eq('status', 'Active')
+        .order('start_date', { ascending: true });
+      if (!error && data) {
+        setSessions(
+          data.map((s: { id: string; name: string; start_date?: string }) => ({
+            id: s.id,
+            name: s.name,
+            date: s.start_date ? new Date(s.start_date).toLocaleDateString() : ''
+          }))
+        );
+      } else {
+        setSessions([]);
+      }
     }
     fetchSessions();
   }, []);
