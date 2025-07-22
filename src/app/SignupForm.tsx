@@ -113,53 +113,53 @@ const SignupForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow font-sans">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-        {errors.general && <p className="text-red-500 text-center mb-4">{errors.general}</p>}
-        {success && <p className="text-green-600 text-center mb-4">{success}</p>}
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow font-sans">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">Sign Up</h2>
+        {errors.general && <p className="text-red-500 dark:text-red-400 text-center mb-4">{errors.general}</p>}
+        {success && <p className="text-green-600 dark:text-green-400 text-center mb-4">{success}</p>}
         <div className="mb-4">
-          <label className="block mb-1 font-medium" htmlFor="email">Email</label>
+          <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={email}
             onChange={e => setEmail(e.target.value)}
             disabled={loading}
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.email}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium" htmlFor="password">Password</label>
+          <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100" htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={password}
             onChange={e => setPassword(e.target.value)}
             disabled={loading}
           />
-          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          {errors.password && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.password}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium" htmlFor="inviteCode">Invite Code <span className="text-gray-400 text-xs">(optional for students)</span></label>
+          <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100" htmlFor="inviteCode">Invite Code <span className="text-gray-400 dark:text-gray-500 text-xs">(optional for students)</span></label>
           <input
             id="inviteCode"
             type="text"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={inviteCode}
             onChange={e => setInviteCode(e.target.value)}
             disabled={loading}
           />
-          <p className="text-gray-500 text-xs mt-1">Leave blank if you&apos;re a student. Required for staff sign up.</p>
-          {errors.inviteCode && <p className="text-red-500 text-sm mt-1">{errors.inviteCode}</p>}
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">Leave blank if you&apos;re a student. Required for staff sign up.</p>
+          {errors.inviteCode && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.inviteCode}</p>}
         </div>
         <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition" disabled={loading}>
           {loading ? 'Signing Up...' : 'Sign Up'}
         </button>
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
           Already have an account?{' '}
-          <a href="/login" className="text-blue-700 hover:underline">Login here</a>
+          <a href="/login" className="text-blue-700 dark:text-blue-300 hover:underline">Login here</a>
         </p>
       </form>
     </>

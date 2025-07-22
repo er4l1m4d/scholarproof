@@ -131,17 +131,17 @@ export default function StudentDashboard() {
       <div className="mb-8 w-full max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">My Certificates</h2>
-          <Link href="/dashboard/student/certificates" className="text-blue-700 hover:underline font-medium">View All</Link>
+          <Link href="/dashboard/student/certificates" className="text-blue-700 dark:text-blue-300 hover:underline font-medium">View All</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {certificates.length === 0 ? (
-            <div className="col-span-3 text-gray-400">No certificates yet.</div>
+            <div className="col-span-3 text-gray-400 dark:text-gray-500">No certificates yet.</div>
           ) : (
             certificates.map(cert => (
               <div key={cert.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
                 <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
-                <div className="text-xs text-gray-500 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
-                <div className="text-sm mb-2">Status: <span className="font-medium">{cert.status || 'Active'}</span></div>
+                <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium text-blue-700 dark:text-blue-300">{cert.status || 'Active'}</span></div>
                 {/* Verification/Share Widget */}
                 <button
                   className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium"
@@ -159,45 +159,45 @@ export default function StudentDashboard() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Upcoming Sessions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {sessions.length === 0 ? (
-            <div className="col-span-3 text-gray-400">No upcoming sessions.</div>
+            <div className="col-span-3 text-gray-400 dark:text-gray-500">No upcoming sessions.</div>
           ) : (
             sessions.map(s => (
               <div key={s.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
                 <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{s.name}</div>
-                <div className="text-xs text-gray-500 mb-2">{s.date}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{s.date}</div>
                 <button className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mt-2">Details</button>
               </div>
             ))
           )}
         </div>
       </div>
-      <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-blue-800">Student Dashboard</h1>
-            <p className="text-gray-600">Welcome, student! 🎓</p>
+            <h1 className="text-2xl font-bold text-blue-800 dark:text-blue-200">Student Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-300">Welcome, student! 🎓</p>
           </div>
           {/* LogoutButton will go here */}
         </div>
         {/* Sort & Filter Controls */}
         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
           <div>
-            <label className="mr-2 font-medium text-sm text-gray-700">Sort:</label>
+            <label className="mr-2 font-medium text-sm text-gray-700 dark:text-gray-200">Sort:</label>
             <select
               value={sortOrder}
               onChange={e => setSortOrder(e.target.value as 'newest' | 'oldest')}
-              className="border rounded px-2 py-1 text-sm"
+              className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
             </select>
           </div>
           <div>
-            <label className="mr-2 font-medium text-sm text-gray-700">Session:</label>
+            <label className="mr-2 font-medium text-sm text-gray-700 dark:text-gray-200">Session:</label>
             <select
               value={sessionFilter}
               onChange={e => setSessionFilter(e.target.value)}
-              className="border rounded px-2 py-1 text-sm"
+              className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               {sessionOptions.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -206,14 +206,14 @@ export default function StudentDashboard() {
           </div>
         </div>
         {displayedCertificates.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400">No certificates found.</div>
+          <div className="col-span-full text-center text-gray-400 dark:text-gray-500">No certificates found.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {displayedCertificates.map(cert => (
               <div key={cert.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
                 <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
-                <div className="text-xs text-gray-500 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
-                <div className="text-sm mb-2">Status: <span className="font-medium">{cert.status || 'Active'}</span></div>
+                <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium text-blue-700 dark:text-blue-300">{cert.status || 'Active'}</span></div>
                 {/* Verification/Share Widget */}
                 <button
                   className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium"

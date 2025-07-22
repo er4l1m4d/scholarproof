@@ -218,72 +218,72 @@ export default function AdminCertificatesPage() {
     setGenLoading(false);
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-900 dark:text-gray-100">Loading...</div>;
+  if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600 dark:text-red-400">Unauthorized</div>;
 
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return (
     <DashboardLayout role="admin">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6">Certificates</h2>
-      <div className="bg-white rounded shadow p-4 mb-4">
+      <h2 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-6">Certificates</h2>
+      <div className="bg-white dark:bg-gray-900 rounded shadow p-4 mb-4">
         <div className="flex flex-wrap gap-4 mb-2">
           <input
             type="text"
             placeholder="Filter by student name"
-            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={studentFilter}
             onChange={e => setStudentFilter(e.target.value)}
           />
           <input
             type="text"
             placeholder="Filter by session"
-            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={sessionFilter}
             onChange={e => setSessionFilter(e.target.value)}
           />
           <input
             type="text"
             placeholder="Filter by status"
-            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            className="px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
           />
         </div>
       </div>
-      <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4" onClick={openGenModal}>+ Generate Certificate</button>
-      <div className="bg-white rounded shadow p-4">
+      <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4">+ Generate Certificate</button>
+      <div className="bg-white dark:bg-gray-900 rounded shadow p-4">
         {loadingCerts ? (
-          <div className="text-center py-8 text-gray-500">Loading certificates...</div>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-300">Loading certificates...</div>
         ) : fetchError ? (
-          <div className="text-center py-8 text-red-500">{fetchError}</div>
+          <div className="text-center py-8 text-red-500 dark:text-red-400">{fetchError}</div>
         ) : filteredCertificates.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">No certificates found.</div>
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">No certificates found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full border text-sm">
+            <table className="min-w-full border text-sm bg-white dark:bg-gray-900">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-3 border">Title</th>
-                  <th className="py-2 px-3 border">Student</th>
-                  <th className="py-2 px-3 border">Session</th>
-                  <th className="py-2 px-3 border">Date Issued</th>
-                  <th className="py-2 px-3 border">Status</th>
-                  <th className="py-2 px-3 border">Actions</th>
+                <tr className="bg-gray-100 dark:bg-gray-800">
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Title</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Student</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Session</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Date Issued</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Status</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCertificates.map(cert => (
                   <tr key={cert.id}>
-                    <td className="py-2 px-3 border font-medium">{cert.title || '-'}</td>
-                    <td className="py-2 px-3 border">{cert.student?.name || '-'}</td>
-                    <td className="py-2 px-3 border">{cert.session?.name || '-'}</td>
-                    <td className="py-2 px-3 border">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : '-'}</td>
-                    <td className="py-2 px-3 border">{cert.status || '-'}</td>
+                    <td className="py-2 px-3 border font-medium text-gray-900 dark:text-gray-100">{cert.title || '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.student?.name || '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.session?.name || '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.status || '-'}</td>
                     <td className="py-2 px-3 border">
-                      <button className="text-blue-700 hover:underline mr-2" onClick={() => openEditModal(cert)}>Edit</button>
-                      <button className="text-yellow-700 hover:underline mr-2" onClick={() => openRegenDialog(cert.id)}>Regenerate</button>
-                      <button className="text-red-600 hover:underline" onClick={() => openRevokeDialog(cert.id)}>Revoke</button>
+                      <button className="text-blue-700 dark:text-blue-300 hover:underline mr-2" onClick={() => openEditModal(cert)}>Edit</button>
+                      <button className="text-yellow-700 dark:text-yellow-300 hover:underline mr-2" onClick={() => openRegenDialog(cert.id)}>Regenerate</button>
+                      <button className="text-red-600 dark:text-red-400 hover:underline" onClick={() => openRevokeDialog(cert.id)}>Revoke</button>
                     </td>
                   </tr>
                 ))}
@@ -295,15 +295,15 @@ export default function AdminCertificatesPage() {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <button
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </button>
-          <span>Page {page} of {totalPages}</span>
+          <span className="text-gray-900 dark:text-gray-100">Page {page} of {totalPages}</span>
           <button
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >
@@ -313,19 +313,19 @@ export default function AdminCertificatesPage() {
       )}
       {editCert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setEditCert(null)} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800">Edit Certificate</h3>
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={() => setEditCert(null)} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">Edit Certificate</h3>
             <form onSubmit={handleEditCert} className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Title</label>
-                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300" value={editCert.title} onChange={e => setEditCert(c => c ? { ...c, title: e.target.value } : c)} required />
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Title</label>
+                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={editCert.title} onChange={e => setEditCert(c => c ? { ...c, title: e.target.value } : c)} required />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Status</label>
-                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300" value={editCert.status} onChange={e => setEditCert(c => c ? { ...c, status: e.target.value } : c)} required />
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Status</label>
+                <input type="text" className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={editCert.status} onChange={e => setEditCert(c => c ? { ...c, status: e.target.value } : c)} required />
               </div>
-              {editError && <div className="text-red-600 text-sm">{editError}</div>}
+              {editError && <div className="text-red-600 dark:text-red-400 text-sm">{editError}</div>}
               <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={editLoading}>{editLoading ? 'Saving...' : 'Save Changes'}</button>
             </form>
           </div>
@@ -333,12 +333,12 @@ export default function AdminCertificatesPage() {
       )}
       {revokeId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
-            <h3 className="text-lg font-bold mb-4 text-red-700">Revoke Certificate</h3>
-            <p className="mb-4">Are you sure you want to revoke this certificate? This action cannot be undone.</p>
-            {revokeError && <div className="text-red-600 text-sm mb-2">{revokeError}</div>}
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h3 className="text-lg font-bold mb-4 text-red-700 dark:text-red-400">Revoke Certificate</h3>
+            <p className="mb-4 text-gray-900 dark:text-gray-100">Are you sure you want to revoke this certificate? This action cannot be undone.</p>
+            {revokeError && <div className="text-red-600 dark:text-red-400 text-sm mb-2">{revokeError}</div>}
             <div className="flex justify-end gap-2">
-              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={() => setRevokeId(null)} disabled={revokeLoading}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium" onClick={() => setRevokeId(null)} disabled={revokeLoading}>Cancel</button>
               <button className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-medium" onClick={handleRevokeCert} disabled={revokeLoading}>{revokeLoading ? 'Revoking...' : 'Revoke'}</button>
             </div>
           </div>
@@ -346,12 +346,12 @@ export default function AdminCertificatesPage() {
       )}
       {regenId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
-            <h3 className="text-lg font-bold mb-4 text-yellow-700">Regenerate Certificate</h3>
-            <p className="mb-4">Are you sure you want to regenerate this certificate?</p>
-            {regenError && <div className="text-red-600 text-sm mb-2">{regenError}</div>}
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h3 className="text-lg font-bold mb-4 text-yellow-700 dark:text-yellow-300">Regenerate Certificate</h3>
+            <p className="mb-4 text-gray-900 dark:text-gray-100">Are you sure you want to regenerate this certificate?</p>
+            {regenError && <div className="text-red-600 dark:text-red-400 text-sm mb-2">{regenError}</div>}
             <div className="flex justify-end gap-2">
-              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={() => setRegenId(null)} disabled={regenLoading}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium" onClick={() => setRegenId(null)} disabled={regenLoading}>Cancel</button>
               <button className="px-4 py-2 rounded bg-yellow-600 hover:bg-yellow-700 text-white font-medium" onClick={handleRegenCert} disabled={regenLoading}>{regenLoading ? 'Regenerating...' : 'Regenerate'}</button>
             </div>
           </div>
@@ -359,29 +359,29 @@ export default function AdminCertificatesPage() {
       )}
       {showGenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowGenModal(false)} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800">Generate Certificate</h3>
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={() => setShowGenModal(false)} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">Generate Certificate</h3>
             <form onSubmit={handleGenerateCert} className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Session</label>
-                <select className="w-full px-3 py-2 border rounded" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Session</label>
+                <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
                   <option value="">Select session</option>
                   {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block mb-1 font-medium">Student</label>
-                <select className="w-full px-3 py-2 border rounded" value={genForm.studentId} onChange={e => setGenForm(f => ({ ...f, studentId: e.target.value }))} required disabled={!genForm.sessionId}>
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Student</label>
+                <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.studentId} onChange={e => setGenForm(f => ({ ...f, studentId: e.target.value }))} required disabled={!genForm.sessionId}>
                   <option value="">Select student</option>
                   {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block mb-1 font-medium">Certificate Title</label>
-                <input type="text" className="w-full px-3 py-2 border rounded" value={genForm.title} onChange={e => setGenForm(f => ({ ...f, title: e.target.value }))} required />
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Certificate Title</label>
+                <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.title} onChange={e => setGenForm(f => ({ ...f, title: e.target.value }))} required />
               </div>
-              {genError && <div className="text-red-600 text-sm">{genError}</div>}
+              {genError && <div className="text-red-600 dark:text-red-400 text-sm">{genError}</div>}
               <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={genLoading}>{genLoading ? 'Generating...' : 'Generate Certificate'}</button>
             </form>
           </div>

@@ -191,8 +191,8 @@ export default function AdminSessionsPage() {
     closeAssignLecturersModal();
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600">Unauthorized</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-900 dark:text-gray-100">Loading...</div>;
+  if (error || role !== 'admin') return <div className="min-h-screen flex items-center justify-center text-red-600 dark:text-red-400">Unauthorized</div>;
 
   // Pagination controls
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
@@ -200,7 +200,7 @@ export default function AdminSessionsPage() {
   return (
     <DashboardLayout role="admin">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-blue-800">Sessions</h2>
+        <h2 className="text-2xl font-bold text-blue-800 dark:text-blue-200">Sessions</h2>
         <button
           className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium"
           onClick={openCreateModal}
@@ -211,21 +211,21 @@ export default function AdminSessionsPage() {
       {/* Modal (Create/Edit) */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold"
               onClick={() => { setShowModal(false); setEditId(null); }}
               aria-label="Close"
             >
               &times;
             </button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800">{editId ? 'Edit Session' : 'Create Session'}</h3>
+            <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">{editId ? 'Edit Session' : 'Create Session'}</h3>
             <form onSubmit={handleCreateOrEditSession} className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium">Session Name</label>
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Session Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   required
@@ -233,20 +233,20 @@ export default function AdminSessionsPage() {
               </div>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block mb-1 font-medium">Start Date</label>
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Start Date</label>
                   <input
                     type="date"
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     value={form.start_date}
                     onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
                     required
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block mb-1 font-medium">End Date</label>
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">End Date</label>
                   <input
                     type="date"
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     value={form.end_date}
                     onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))}
                     required
@@ -254,9 +254,9 @@ export default function AdminSessionsPage() {
                 </div>
               </div>
               <div>
-                <label className="block mb-1 font-medium">Status</label>
+                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Status</label>
                 <select
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   value={form.status}
                   onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
                 >
@@ -265,7 +265,7 @@ export default function AdminSessionsPage() {
                   ))}
                 </select>
               </div>
-              {formError && <div className="text-red-600 text-sm">{formError}</div>}
+              {formError && <div className="text-red-600 dark:text-red-400 text-sm">{formError}</div>}
               <button
                 type="submit"
                 className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium"
@@ -280,13 +280,13 @@ export default function AdminSessionsPage() {
       {/* Delete Confirmation Dialog */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
-            <h3 className="text-lg font-bold mb-4 text-red-700">Delete Session</h3>
-            <p className="mb-4">Are you sure you want to delete this session? This action cannot be undone.</p>
-            {deleteError && <div className="text-red-600 text-sm mb-2">{deleteError}</div>}
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h3 className="text-lg font-bold mb-4 text-red-700 dark:text-red-400">Delete Session</h3>
+            <p className="mb-4 text-gray-900 dark:text-gray-100">Are you sure you want to delete this session? This action cannot be undone.</p>
+            {deleteError && <div className="text-red-600 dark:text-red-400 text-sm mb-2">{deleteError}</div>}
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+                className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
                 onClick={() => setDeleteId(null)}
                 disabled={deleteLoading}
               >
@@ -305,21 +305,21 @@ export default function AdminSessionsPage() {
       )}
       {assignSessionId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={closeAssignLecturersModal} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800">Assign Lecturers</h3>
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={closeAssignLecturersModal} aria-label="Close">&times;</button>
+            <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">Assign Lecturers</h3>
             {assignLoading ? (
-              <div className="text-center py-4 text-gray-500">Loading...</div>
+              <div className="text-center py-4 text-gray-500 dark:text-gray-300">Loading...</div>
             ) : (
               <form onSubmit={e => { e.preventDefault(); handleAssignLecturersSave(); }} className="space-y-4">
                 <div>
-                  <label className="block mb-1 font-medium">Lecturers</label>
-                  <div className="max-h-48 overflow-y-auto border rounded p-2 bg-gray-50">
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Lecturers</label>
+                  <div className="max-h-48 overflow-y-auto border rounded p-2 bg-gray-50 dark:bg-gray-800">
                     {lecturers.length === 0 ? (
-                      <div className="text-gray-400">No lecturers found.</div>
+                      <div className="text-gray-400 dark:text-gray-500">No lecturers found.</div>
                     ) : (
                       lecturers.map(l => (
-                        <label key={l.id} className="flex items-center gap-2 py-1">
+                        <label key={l.id} className="flex items-center gap-2 py-1 text-gray-900 dark:text-gray-100">
                           <input
                             type="checkbox"
                             checked={assignedLecturers.includes(l.id)}
@@ -334,9 +334,9 @@ export default function AdminSessionsPage() {
                     )}
                   </div>
                 </div>
-                {assignError && <div className="text-red-600 text-sm">{assignError}</div>}
+                {assignError && <div className="text-red-600 dark:text-red-400 text-sm">{assignError}</div>}
                 <div className="flex justify-end gap-2">
-                  <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium" onClick={closeAssignLecturersModal} disabled={assignLoading}>Cancel</button>
+                  <button type="button" className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium" onClick={closeAssignLecturersModal} disabled={assignLoading}>Cancel</button>
                   <button type="submit" className="px-4 py-2 rounded bg-blue-700 hover:bg-blue-800 text-white font-medium" disabled={assignLoading}>{assignLoading ? 'Saving...' : 'Save'}</button>
                 </div>
               </form>
@@ -344,34 +344,34 @@ export default function AdminSessionsPage() {
           </div>
         </div>
       )}
-      <div className="bg-white rounded shadow p-4">
+      <div className="bg-white dark:bg-gray-900 rounded shadow p-4">
         {loadingSessions ? (
-          <div className="text-center py-8 text-gray-500">Loading sessions...</div>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-300">Loading sessions...</div>
         ) : sessions.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">No sessions found.</div>
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">No sessions found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full border text-sm">
+            <table className="min-w-full border text-sm bg-white dark:bg-gray-900">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-3 border">Name</th>
-                  <th className="py-2 px-3 border">Start Date</th>
-                  <th className="py-2 px-3 border">End Date</th>
-                  <th className="py-2 px-3 border">Status</th>
-                  <th className="py-2 px-3 border">Actions</th>
+                <tr className="bg-gray-100 dark:bg-gray-800">
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Name</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Start Date</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">End Date</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Status</th>
+                  <th className="py-2 px-3 border text-gray-900 dark:text-gray-100">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {sessions.map(session => (
                   <tr key={session.id}>
-                    <td className="py-2 px-3 border font-medium">{session.name}</td>
-                    <td className="py-2 px-3 border">{session.start_date ? new Date(session.start_date).toLocaleDateString() : '-'}</td>
-                    <td className="py-2 px-3 border">{session.end_date ? new Date(session.end_date).toLocaleDateString() : '-'}</td>
-                    <td className="py-2 px-3 border">{session.status || '-'}</td>
+                    <td className="py-2 px-3 border font-medium text-gray-900 dark:text-gray-100">{session.name}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{session.start_date ? new Date(session.start_date).toLocaleDateString() : '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{session.end_date ? new Date(session.end_date).toLocaleDateString() : '-'}</td>
+                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{session.status || '-'}</td>
                     <td className="py-2 px-3 border">
-                      <button className="text-blue-700 hover:underline mr-2" onClick={() => openEditModal(session)}>Edit</button>
-                      <button className="text-red-600 hover:underline" onClick={() => openDeleteDialog(session.id)}>Delete</button>
-                      <button className="text-green-700 hover:underline ml-2" onClick={() => openAssignLecturersModal(session.id)}>Assign Lecturers</button>
+                      <button className="text-blue-700 dark:text-blue-300 hover:underline mr-2" onClick={() => openEditModal(session)}>Edit</button>
+                      <button className="text-red-600 dark:text-red-400 hover:underline" onClick={() => openDeleteDialog(session.id)}>Delete</button>
+                      <button className="text-green-700 dark:text-green-300 hover:underline ml-2" onClick={() => openAssignLecturersModal(session.id)}>Assign Lecturers</button>
                     </td>
                   </tr>
                 ))}
@@ -383,15 +383,15 @@ export default function AdminSessionsPage() {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <button
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </button>
-          <span>Page {page} of {totalPages}</span>
+          <span className="text-gray-900 dark:text-gray-100">Page {page} of {totalPages}</span>
           <button
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

@@ -80,17 +80,17 @@ export default function StudentCertificatesPage() {
         ) : error ? (
           <div className="text-center text-red-600 dark:text-red-400">{error}</div>
         ) : certificates.length === 0 ? (
-          <div className="text-center text-gray-400 dark:text-gray-500">No certificates found.</div>
+          <div className="text-center text-gray-500 dark:text-gray-300">No certificates found.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {certificates.map(cert => (
               <div key={cert.id} className="bg-white dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
                 <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{cert.title || 'Certificate'}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''}</div>
                 {cert.session && (
-                  <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">Session: {cert.session.name}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">Session: <span className="font-semibold text-gray-900 dark:text-gray-100">{cert.session.name}</span></div>
                 )}
-                <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium">{cert.status || 'Active'}</span></div>
+                <div className="text-sm mb-2 text-gray-900 dark:text-gray-100">Status: <span className="font-medium text-blue-700 dark:text-blue-300">{cert.status || 'Active'}</span></div>
                 <button
                   className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mb-2"
                   onClick={() => handleCopyLink(cert.id)}
@@ -102,7 +102,7 @@ export default function StudentCertificatesPage() {
                     href={cert.irys_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                    className="text-xs text-blue-700 dark:text-blue-300 hover:underline mt-1"
                   >
                     View on Irys
                   </a>
@@ -115,7 +115,7 @@ export default function StudentCertificatesPage() {
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-4 mt-8">
             <button
-              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-100 font-medium"
+              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
             >
@@ -123,7 +123,7 @@ export default function StudentCertificatesPage() {
             </button>
             <span className="text-gray-900 dark:text-gray-100">Page {page} of {totalPages}</span>
             <button
-              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-100 font-medium"
+              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium"
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
