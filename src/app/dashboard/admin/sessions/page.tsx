@@ -135,6 +135,22 @@ export default function AdminSessionsPage() {
     if (!deleteId) return;
     setDeleteLoading(true);
     setDeleteError('');
+    // Deletion protection: check for certificates linked to this session
+    const { count, error: certCountError } = await supabase
+      .from('certificates')
+      .select('id', { count: 'exact', head: true })
+      .eq('session_id', deleteId);
+    if (certCountError) {
+      setDeleteError(certCountError.message);
+      setDeleteLoading(false);
+      return;
+    }
+    if ((count || 0) > 0) {
+      setDeleteError('Cannot delete session: certificates are linked to this session.');
+      setDeleteLoading(false);
+      return;
+    }
+    // Proceed with deletion if no certificates are linked
     const { error } = await supabase.from('sessions').delete().eq('id', deleteId);
     if (error) {
       setDeleteError(error.message);
