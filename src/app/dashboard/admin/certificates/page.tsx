@@ -84,7 +84,7 @@ export default function AdminCertificatesPage() {
     const to = from + pageSize - 1;
     const { data, error, count } = await supabase
       .from('certificates')
-      .select('id, title, created_at, status, students(id, name), sessions(id, name)', { count: 'exact' })
+      .select('id, title, created_at, status, student_id, session_id', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to);
     if (error || !data) {
@@ -92,13 +92,7 @@ export default function AdminCertificatesPage() {
       setCertificates([]);
       setTotalCount(0);
     } else {
-      setCertificates(
-        data.map((cert: RawCertificate) => ({
-          ...cert,
-          student: cert.students && cert.students.length > 0 ? cert.students[0] : undefined,
-          session: cert.sessions && cert.sessions.length > 0 ? cert.sessions[0] : undefined,
-        }))
-      );
+      setCertificates(data);
       setTotalCount(count || 0);
     }
     setLoadingCerts(false);
@@ -299,20 +293,24 @@ export default function AdminCertificatesPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredCertificates.map(cert => (
-                  <tr key={cert.id}>
-                    <td className="py-2 px-3 border font-medium text-gray-900 dark:text-gray-100">{cert.title || '-'}</td>
-                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.student?.name || '-'}</td>
-                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.session?.name || '-'}</td>
-                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : '-'}</td>
-                    <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.status || '-'}</td>
-                    <td className="py-2 px-3 border">
-                      <button className="text-blue-700 dark:text-blue-300 hover:underline mr-2" onClick={() => openEditModal(cert)}>Edit</button>
-                      <button className="text-yellow-700 dark:text-yellow-300 hover:underline mr-2" onClick={() => openRegenDialog(cert.id)}>Regenerate</button>
-                      <button className="text-red-600 dark:text-red-400 hover:underline" onClick={() => openRevokeDialog(cert.id)}>Revoke</button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredCertificates.map(cert => {
+                  const studentName = studentsList.find(s => s.id === cert.student_id)?.name || cert.student_id || '-';
+                  const sessionName = sessionsList.find(s => s.id === cert.session_id)?.name || cert.session_id || '-';
+                  return (
+                    <tr key={cert.id}>
+                      <td className="py-2 px-3 border font-medium text-gray-900 dark:text-gray-100">{cert.title || '-'}</td>
+                      <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{studentName}</td>
+                      <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{sessionName}</td>
+                      <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.created_at ? new Date(cert.created_at).toLocaleDateString() : '-'}</td>
+                      <td className="py-2 px-3 border text-gray-900 dark:text-gray-100">{cert.status || '-'}</td>
+                      <td className="py-2 px-3 border">
+                        <button className="text-blue-700 dark:text-blue-300 hover:underline mr-2" onClick={() => openEditModal(cert)}>Edit</button>
+                        <button className="text-yellow-700 dark:text-yellow-300 hover:underline mr-2" onClick={() => openRegenDialog(cert.id)}>Regenerate</button>
+                        <button className="text-red-600 dark:text-red-400 hover:underline" onClick={() => openRevokeDialog(cert.id)}>Revoke</button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
