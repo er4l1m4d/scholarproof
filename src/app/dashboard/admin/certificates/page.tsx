@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
+import Link from 'next/link';
 
 interface Certificate {
   id: string;
@@ -249,7 +250,11 @@ export default function AdminCertificatesPage() {
           />
         </div>
       </div>
-      <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4">+ Generate Certificate</button>
+      <Link href="/dashboard/admin/certificates/new">
+        <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4">
+          + Generate Certificate
+        </button>
+      </Link>
       <div className="bg-white dark:bg-gray-900 rounded shadow p-4">
         {loadingCerts ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-300">Loading certificates...</div>

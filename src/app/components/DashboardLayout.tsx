@@ -60,10 +60,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
   // Remove collapse button, always show full icons and labels
   // Hamburger menu toggles sidebar on all screen sizes
 
-  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  // Remove all state and handlers related to profilePictureUrl, previewUrl, selectedFileName, uploading, handleProfilePicUpload
+  // Remove all UI for profile picture upload, preview, and file input from the profile modal and topbar
+  // Only keep the name input and save button in the profile modal
+
   // Close menu on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -103,38 +103,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
       return;
     }
     setProfileName(data.name || '');
-    setProfilePictureUrl(data.profile_picture_url || null);
-    setPreviewUrl(data.profile_picture_url || null);
     setProfileLoading(false);
-  }
-
-  async function handleProfilePicUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSelectedFileName(file.name);
-    setUploading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}.${fileExt}`;
-      // Upload to Supabase Storage (ensure bucket name is correct)
-      const { error: uploadError } = await supabase.storage.from('profile-pictures').upload(filePath, file, { upsert: true });
-      if (uploadError) throw uploadError;
-      // Get public URL
-      const { data } = supabase.storage.from('profile-pictures').getPublicUrl(filePath);
-      setPreviewUrl(data.publicUrl);
-      setProfilePictureUrl(data.publicUrl);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setProfileError(err.message);
-        console.error('Profile picture upload error:', err);
-      } else {
-        setProfileError('Failed to upload image');
-      }
-    } finally {
-      setUploading(false);
-    }
   }
 
   async function handleProfileSave(e: React.FormEvent) {
@@ -150,7 +119,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
     }
     // Replace 'any' with a specific type
     const updateData: Record<string, string | null> = { name: profileName };
-    if (profilePictureUrl) updateData.profile_picture_url = profilePictureUrl;
     const { error: updateError } = await supabase.from('users').update(updateData).eq('id', user.id);
     if (updateError) {
       setProfileError(updateError.message);
@@ -237,11 +205,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
           <div className="flex items-center gap-4">
             {/* Placeholder avatar (topbar) */}
             <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-black overflow-hidden">
-              {profilePictureUrl ? (
-                <img src={profilePictureUrl} alt="Profile" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                <span>{role.charAt(0).toUpperCase()}</span>
-              )}
+              {/* Removed profile picture display */}
+              <span>{role.charAt(0).toUpperCase()}</span>
             </div>
             {/* Menu */}
             <div className="relative profile-menu">
@@ -273,30 +238,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowProfileModal(false)} aria-label="Close">&times;</button>
             <h3 className="text-xl font-black mb-4 text-blue-800">Edit Profile</h3>
             <form onSubmit={handleProfileSave} className="space-y-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-black overflow-hidden">
-                  {previewUrl ? (
-                    <img src={previewUrl} alt="Profile Preview" className="w-full h-full object-cover rounded-full" />
-                  ) : (
-                    <span className="text-3xl">{role.charAt(0).toUpperCase()}</span>
-                  )}
-                </div>
-                <input
-                  id="profile-pic"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePicUpload}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                <label
-                  htmlFor="profile-pic"
-                  className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium"
-                >
-                  {uploading ? "Uploading..." : "Choose Profile Picture"}
-                </label>
-                {selectedFileName && <span className="text-xs mt-1">{selectedFileName}</span>}
-              </div>
               <div>
                 <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Name</label>
                 <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={profileName} onChange={e => setProfileName(e.target.value)} required />
