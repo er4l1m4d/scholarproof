@@ -51,7 +51,6 @@ export default function AdminCertificatesPage() {
   const [sessionsList, setSessionsList] = useState<SessionOption[]>([]);
   const [studentsList, setStudentsList] = useState<StudentOption[]>([]);
   const [genForm, setGenForm] = useState({ sessionId: '', studentId: '', title: '' });
-  const [accentColor, setAccentColor] = useState('#2563eb'); // Nice blue
   const [style, setStyle] = useState('Elegant');
   const [showPreview, setShowPreview] = useState(false);
 
@@ -362,10 +361,6 @@ export default function AdminCertificatesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block mb-1 font-medium">Accent Color</label>
-                  <input type="color" className="w-12 h-8 p-0 border rounded" value={accentColor} onChange={e => setAccentColor(e.target.value)} />
-                </div>
-                <div>
                   <label className="block mb-1 font-medium">Session</label>
                   <select className="w-full border rounded px-3 py-2" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
                     <option value="">Select session</option>
@@ -396,18 +391,20 @@ export default function AdminCertificatesPage() {
             </div>
             {/* Right: Certificate Preview */}
             <div className="flex-1 flex flex-col min-w-0">
-              <div className="border border-gray-300 rounded-lg bg-gray-50 flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[200px] overflow-auto">
+              <div className="flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[200px]">
                 {showPreview ? (
                   <div className="w-full flex justify-center">
-                    <div className="max-w-full" style={{ width: '100%', minWidth: 0 }}>
-                      <div className="sm:scale-75 scale-100 origin-top sm:max-w-[90vw]">
-                        <CertificateTemplate
-                          studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
-                          title={genForm.title || 'Certificate Title'}
-                          description={''}
-                          dateIssued={new Date().toLocaleDateString()}
-                          revoked={false}
-                        />
+                    <div className="relative" style={{ width: '420px', height: '297px', maxWidth: '100%', maxHeight: '50vw' }}>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div style={{ transform: 'scale(' + Math.min(1, (window.innerWidth < 600 ? 0.5 : 1)) + ')', width: '100%', height: '100%', transformOrigin: 'top left' }}>
+                          <CertificateTemplate
+                            studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
+                            title={genForm.title || 'Certificate Title'}
+                            description={''}
+                            dateIssued={new Date().toLocaleDateString()}
+                            revoked={false}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
