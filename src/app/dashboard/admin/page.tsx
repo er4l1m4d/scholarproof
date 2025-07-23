@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   const [studentSummaries, setStudentSummaries] = useState<StudentSummary[]>([]);
   const [studentSummaryLoading, setStudentSummaryLoading] = useState(true);
   const [studentSummaryError, setStudentSummaryError] = useState<string | null>(null);
+  const [selectedStudentSessionId, setSelectedStudentSessionId] = useState<string>('all');
 
   useEffect(() => {
     async function fetchName() {
@@ -161,6 +162,23 @@ export default function AdminDashboard() {
       {/* Student Summary Section */}
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md mt-8">
         <h2 className="text-xl font-bold text-green-700 dark:text-green-300 mb-4 text-left">Student Summary</h2>
+        {/* Session Filter Dropdown for Student Summary */}
+        {sessionSummaries.length > 0 && (
+          <div className="mb-6 text-left">
+            <label className="block mb-1 font-medium" htmlFor="student-session-filter">Filter by Session</label>
+            <select
+              id="student-session-filter"
+              className="border rounded px-3 py-2 w-full max-w-xs"
+              value={selectedStudentSessionId}
+              onChange={e => setSelectedStudentSessionId(e.target.value)}
+            >
+              <option value="all">All Sessions</option>
+              {sessionSummaries.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         {studentSummaryLoading ? (
           <div className="text-gray-500 dark:text-gray-300">Loading student summary...</div>
         ) : studentSummaryError ? (
@@ -180,7 +198,10 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {studentSummaries.map((s) => (
+                  {(selectedStudentSessionId === 'all'
+                    ? studentSummaries
+                    : studentSummaries.filter(s => s.certCount > 0 && sessionSummaries.find(sess => sess.id === selectedStudentSessionId && sess.certCount > 0)))
+                    .map((s) => (
                     <tr key={s.id} className="border-t border-gray-200 dark:border-gray-700">
                       <td className="px-4 py-2">{s.full_name}</td>
                       <td className="px-4 py-2">{s.email}</td>
@@ -193,7 +214,9 @@ export default function AdminDashboard() {
             {/* Bar Chart */}
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={studentSummaries} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <BarChart data={selectedStudentSessionId === 'all'
+                  ? studentSummaries
+                  : studentSummaries.filter(s => s.certCount > 0 && sessionSummaries.find(sess => sess.id === selectedStudentSessionId && sess.certCount > 0))} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="full_name" tick={{ fontSize: 12 }} />
                   <YAxis allowDecimals={false} />
