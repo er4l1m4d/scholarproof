@@ -1,9 +1,7 @@
 "use client";
 
 import DashboardLayout from '../../../components/DashboardLayout';
-import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useRef, useState } from 'react';
-import { supabase } from '../../../supabaseClient';
 import CertificateTemplate from '../../../components/CertificateTemplate';
 
 interface Student {
@@ -149,7 +147,7 @@ export default function AdminCertificatesPage() {
                       </div>
                     ) : (
                       <p className="text-gray-500 text-center p-4">
-                        Click "Generate Preview" to see your certificate.
+                        Click &quot;Generate Preview&quot; to see your certificate.
                       </p>
                     )}
                   </div>
