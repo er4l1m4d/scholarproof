@@ -5,6 +5,7 @@ import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 interface Certificate {
   id: string;
@@ -208,11 +209,14 @@ export default function AdminCertificatesPage() {
       title: genForm.title,
       status: 'Active',
     });
-    if (error) setGenError(error.message);
-    else {
+    if (error) {
+      setGenError(error.message);
+    } else {
       setShowGenModal(false);
       setGenForm({ sessionId: '', studentId: '', title: '' });
-      fetchCertificates(page);
+      setPage(1); // Always go to first page after insert
+      fetchCertificates(1); // Fetch first page to show newest
+      toast.success('Certificate created successfully!');
     }
     setGenLoading(false);
   }
