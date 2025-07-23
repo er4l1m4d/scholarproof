@@ -13,17 +13,8 @@ interface Certificate {
   title?: string;
   created_at?: string;
   status?: string;
-  student?: { id: string; name: string };
-  session?: { id: string; name: string };
-}
-
-interface RawCertificate {
-  id: string;
-  title?: string;
-  created_at?: string;
-  status?: string;
-  students?: { id: string; name: string }[];
-  sessions?: { id: string; name: string }[];
+  student_id?: string;
+  session_id?: string;
 }
 
 interface EditForm {
@@ -114,8 +105,8 @@ export default function AdminCertificatesPage() {
   // Filter logic (simple client-side for now)
   const filteredCertificates = certificates.filter(cert => {
     return (
-      (!studentFilter || cert.student?.name?.toLowerCase().includes(studentFilter.toLowerCase())) &&
-      (!sessionFilter || cert.session?.name?.toLowerCase().includes(sessionFilter.toLowerCase())) &&
+      (!studentFilter || cert.student_id?.toLowerCase().includes(studentFilter.toLowerCase())) &&
+      (!sessionFilter || cert.session_id?.toLowerCase().includes(sessionFilter.toLowerCase())) &&
       (!statusFilter || (cert.status || '').toLowerCase().includes(statusFilter.toLowerCase()))
     );
   });
