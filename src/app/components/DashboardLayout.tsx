@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../supabaseClient';
 import { HiOutlineHome, HiOutlineCalendar, HiOutlineDocumentText, HiOutlineUsers, HiOutlineKey } from 'react-icons/hi2';
-import { useTheme } from '../hooks/useTheme';
+// Remove import { useTheme } from '../hooks/useTheme';
 
 interface DashboardLayoutProps {
   role: 'admin' | 'lecturer' | 'student';
@@ -164,7 +164,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
     router.push('/login');
   }
 
-  const { theme, setTheme } = useTheme();
+  // Remove theme, setTheme, and the theme toggle button from the topbar.
 
   return (
     <div className="min-h-screen flex bg-gray-50 font-sans">
@@ -232,14 +232,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
             </span>
           </div>
           <div className="flex items-center gap-4">
-            {/* Theme toggle button */}
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="px-3 py-1 rounded border font-medium bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
-            </button>
             {/* Placeholder avatar (topbar) */}
             <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-black overflow-hidden">
               {profilePictureUrl ? (
