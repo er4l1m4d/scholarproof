@@ -250,11 +250,12 @@ export default function AdminCertificatesPage() {
           />
         </div>
       </div>
-      <Link href="/dashboard/admin/certificates/new">
-        <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4">
-          + Generate Certificate
-        </button>
-      </Link>
+      <button
+        className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition font-medium mb-4"
+        onClick={openGenModal}
+      >
+        + Generate Certificate
+      </button>
       <div className="bg-white dark:bg-gray-900 rounded shadow p-4">
         {loadingCerts ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-300">Loading certificates...</div>
