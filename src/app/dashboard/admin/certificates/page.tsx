@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import CertificateTemplate from '../../../components/CertificateTemplate';
 
 interface Certificate {
   id: string;
@@ -62,6 +63,7 @@ export default function AdminCertificatesPage() {
   const [genForm, setGenForm] = useState({ sessionId: '', studentId: '', title: '' });
   const [genLoading, setGenLoading] = useState(false);
   const [genError, setGenError] = useState('');
+  const [previewData, setPreviewData] = useState({ sessionName: '', studentName: '', title: '' });
 
   useEffect(() => {
     if (role === 'admin') {
@@ -187,11 +189,14 @@ export default function AdminCertificatesPage() {
     setGenForm({ sessionId: '', studentId: '', title: '' });
     setGenError('');
     setStudentsList([]);
+    setPreviewData({ sessionName: '', studentName: '', title: '' });
   }
 
   async function handleGenSessionChange(sessionId: string) {
     setGenForm(f => ({ ...f, sessionId, studentId: '' }));
     await fetchStudentsList(sessionId);
+    const session = sessionsList.find(s => s.id === sessionId);
+    setPreviewData(prev => ({ ...prev, sessionName: session ? session.name : '' }));
   }
 
   async function handleGenerateCert(e: React.FormEvent) {
@@ -200,6 +205,7 @@ export default function AdminCertificatesPage() {
     setGenError('');
     if (!genForm.sessionId || !genForm.studentId || !genForm.title) {
       setGenError('All fields are required.');
+      toast.error('All fields are required.');
       setGenLoading(false);
       return;
     }
@@ -211,14 +217,26 @@ export default function AdminCertificatesPage() {
     });
     if (error) {
       setGenError(error.message);
+      toast.error('Failed to create certificate: ' + error.message);
     } else {
       setShowGenModal(false);
       setGenForm({ sessionId: '', studentId: '', title: '' });
+      setPreviewData({ sessionName: '', studentName: '', title: '' });
       setPage(1); // Always go to first page after insert
       fetchCertificates(1); // Fetch first page to show newest
       toast.success('Certificate created successfully!');
     }
     setGenLoading(false);
+  }
+
+  function handleGenStudentChange(studentId: string) {
+    setGenForm(f => ({ ...f, studentId }));
+    const student = studentsList.find(s => s.id === studentId);
+    setPreviewData(prev => ({ ...prev, studentName: student ? student.name : '' }));
+  }
+  function handleGenTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setGenForm(f => ({ ...f, title: e.target.value }));
+    setPreviewData(prev => ({ ...prev, title: e.target.value }));
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-900 dark:text-gray-100">Loading...</div>;
@@ -367,31 +385,45 @@ export default function AdminCertificatesPage() {
       )}
       {showGenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-3xl relative flex flex-row gap-8">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={() => setShowGenModal(false)} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">Generate Certificate</h3>
-            <form onSubmit={handleGenerateCert} className="space-y-4">
-              <div>
-                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Session</label>
-                <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
-                  <option value="">Select session</option>
-                  {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
+            {/* Preview on the left */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="w-full max-w-xs">
+                <CertificateTemplate
+                  studentName={previewData.studentName || 'Student Name'}
+                  title={previewData.title || 'Certificate Title'}
+                  description={''}
+                  dateIssued={new Date().toLocaleDateString()}
+                />
               </div>
-              <div>
-                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Student</label>
-                <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.studentId} onChange={e => setGenForm(f => ({ ...f, studentId: e.target.value }))} required disabled={!genForm.sessionId}>
-                  <option value="">Select student</option>
-                  {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Certificate Title</label>
-                <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.title} onChange={e => setGenForm(f => ({ ...f, title: e.target.value }))} required />
-              </div>
-              {genError && <div className="text-red-600 dark:text-red-400 text-sm">{genError}</div>}
-              <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={genLoading}>{genLoading ? 'Generating...' : 'Generate Certificate'}</button>
-            </form>
+            </div>
+            {/* Form on the right */}
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-4 text-blue-800 dark:text-blue-200">Generate Certificate</h3>
+              <form onSubmit={handleGenerateCert} className="space-y-4">
+                <div>
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Session</label>
+                  <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
+                    <option value="">Select session</option>
+                    {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Student</label>
+                  <select className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.studentId} onChange={e => handleGenStudentChange(e.target.value)} required disabled={!genForm.sessionId}>
+                    <option value="">Select student</option>
+                    {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Certificate Title</label>
+                  <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={genForm.title} onChange={handleGenTitleChange} required />
+                </div>
+                {genError && <div className="text-red-600 dark:text-red-400 text-sm">{genError}</div>}
+                <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium" disabled={genLoading}>{genLoading ? 'Generating...' : 'Generate Certificate'}</button>
+              </form>
+            </div>
           </div>
         </div>
       )}
