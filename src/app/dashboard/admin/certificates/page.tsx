@@ -104,9 +104,11 @@ export default function AdminCertificatesPage() {
 
   // Filter logic (simple client-side for now)
   const filteredCertificates = certificates.filter(cert => {
+    const studentName = studentsList.find(s => s.id === cert.student_id)?.name || '';
+    const sessionName = sessionsList.find(s => s.id === cert.session_id)?.name || '';
     return (
-      (!studentFilter || cert.student_id?.toLowerCase().includes(studentFilter.toLowerCase())) &&
-      (!sessionFilter || cert.session_id?.toLowerCase().includes(sessionFilter.toLowerCase())) &&
+      (!studentFilter || studentName.toLowerCase().includes(studentFilter.toLowerCase())) &&
+      (!sessionFilter || sessionName.toLowerCase().includes(sessionFilter.toLowerCase())) &&
       (!statusFilter || (cert.status || '').toLowerCase().includes(statusFilter.toLowerCase()))
     );
   });
@@ -376,9 +378,9 @@ export default function AdminCertificatesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-3xl relative flex flex-row gap-8">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={() => setShowGenModal(false)} aria-label="Close">&times;</button>
-            {/* Preview on the left */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="w-full max-w-xs">
+            {/* Responsive Preview on the left */}
+            <div className="flex-1 flex items-center justify-center overflow-auto" style={{ minWidth: 0 }}>
+              <div style={{ width: '397px', height: '561.5px', transform: 'scale(0.5)', transformOrigin: 'top left' }}>
                 <CertificateTemplate
                   studentName={previewData.studentName || 'Student Name'}
                   title={previewData.title || 'Certificate Title'}
