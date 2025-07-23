@@ -16,17 +16,26 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
   title,
   description,
   dateIssued,
-  institutionName = "ScholarProof University",
-  institutionLogoUrl = "/file.svg", // Default logo
+  institutionName,
+  institutionLogoUrl,
   revoked = false,
 }) => {
   return (
-    <div className="bg-white shadow-xl rounded-lg border-4 border-gray-200 p-8 max-w-2xl mx-auto font-sans relative print:max-w-full print:shadow-none print:border-0 print:p-4">
+    <div
+      className="bg-white shadow-xl rounded-lg border-4 border-gray-200 p-8 mx-auto font-sans relative print:max-w-full print:shadow-none print:border-0 print:p-4"
+      style={{ width: '794px', height: '1123px' }} // A4 size at 96dpi
+    >
       {/* Logo and Institution */}
-      <div className="flex items-center justify-center mb-6">
-        <Image src={institutionLogoUrl} alt="Institution Logo" width={64} height={64} className="h-16 w-16 mr-4" />
-        <span className="text-2xl font-bold tracking-wide uppercase text-gray-800">{institutionName}</span>
-      </div>
+      {(institutionName || institutionLogoUrl) && (
+        <div className="flex items-center justify-center mb-6">
+          {institutionLogoUrl && (
+            <Image src={institutionLogoUrl} alt="Institution Logo" width={64} height={64} className="h-16 w-16 mr-4" />
+          )}
+          {institutionName && (
+            <span className="text-2xl font-bold tracking-wide uppercase text-gray-800">{institutionName}</span>
+          )}
+        </div>
+      )}
       {/* Title */}
       <h2 className="text-3xl font-extrabold text-center mb-2 tracking-tight">{title}</h2>
       {/* Student Name */}
@@ -48,10 +57,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
           REVOKED
         </div>
       )}
-      {/* Watermark (optional, faded) */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span className="text-6xl font-extrabold text-gray-200 opacity-20 tracking-widest">ScholarProof</span>
-      </div>
+      {/* Watermark removed */}
     </div>
   );
 };
