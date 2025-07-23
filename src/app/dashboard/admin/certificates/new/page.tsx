@@ -23,7 +23,7 @@ type FormData = z.infer<typeof schema>;
 // Define explicit types for students and sessions
 interface Student {
   id: string;
-  full_name: string;
+  name: string;
 }
 interface Session {
   id: string;
@@ -65,7 +65,7 @@ export default function NewCertificatePage() {
         // Fetch students
         const { data: studentsData, error: studentsError } = await supabase
           .from("users")
-          .select("id, full_name")
+          .select("id, name")
           .eq("role", "student");
         if (studentsError) throw studentsError;
         setStudents((studentsData as Student[]) || []);
@@ -150,7 +150,7 @@ export default function NewCertificatePage() {
         <div ref={certificateRef}>
           <CertificateTemplate
             studentName={
-              students.find((s) => s.id === previewData.studentId)?.full_name || "Student Name"
+              students.find((s) => s.id === previewData.studentId)?.name || "Student Name"
             }
             title={previewData.title}
             description={previewData.description}
@@ -218,7 +218,7 @@ export default function NewCertificatePage() {
             <option value="">Select student</option>
             {students.map((student) => (
               <option key={student.id} value={student.id}>
-                {student.full_name || student.id}
+                {student.name || student.id}
               </option>
             ))}
           </select>
