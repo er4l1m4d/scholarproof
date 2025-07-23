@@ -4,7 +4,7 @@ import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 import CertificateTemplate from '../../../components/CertificateTemplate';
 
 interface Certificate {
@@ -179,12 +179,10 @@ export default function AdminCertificatesPage() {
   async function handleGenSessionChange(sessionId: string) {
     setGenForm(f => ({ ...f, sessionId, studentId: '' }));
     await fetchStudentsList(sessionId);
-    const session = sessionsList.find(s => s.id === sessionId);
   }
 
   function handleGenStudentChange(studentId: string) {
     setGenForm(f => ({ ...f, studentId }));
-    const student = studentsList.find(s => s.id === studentId);
   }
   function handleGenTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setGenForm(f => ({ ...f, title: e.target.value }));
@@ -405,7 +403,6 @@ export default function AdminCertificatesPage() {
                     title={genForm.title || 'Certificate Title'}
                     description={''}
                     dateIssued={new Date().toLocaleDateString()}
-                    institutionName={''}
                     revoked={false}
                   />
                 ) : (
