@@ -66,6 +66,22 @@ export default function AdminCertificatesPage() {
     }
   }, [role, showGenModal]);
 
+  useEffect(() => {
+    function updateScale() {
+      const box = document.getElementById('certificate-scale')?.parentElement;
+      if (box && box.firstChild) {
+        const scale = Math.min(
+          box.offsetWidth / 420,
+          box.offsetHeight / 297
+        );
+        (box.firstChild as HTMLElement).style.transform = `scale(${scale})`;
+      }
+    }
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [showPreview]);
+
   async function fetchCertificates(pageNum: number) {
     setLoadingCerts(true);
     setFetchError('');
@@ -394,9 +410,22 @@ export default function AdminCertificatesPage() {
               <div className="flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[200px]">
                 {showPreview ? (
                   <div className="w-full flex justify-center">
-                    <div className="relative" style={{ width: '420px', height: '297px', maxWidth: '100%', maxHeight: '50vw' }}>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div style={{ transform: 'scale(' + Math.min(1, (window.innerWidth < 600 ? 0.5 : 1)) + ')', width: '100%', height: '100%', transformOrigin: 'top left' }}>
+                    <div
+                      className="relative w-full max-w-[520px] aspect-[420/297] bg-gray-50 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden"
+                    >
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div
+                          id="certificate-scale"
+                          style={{
+                            width: '420px',
+                            height: '297px',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            transformOrigin: 'top left',
+                          }}
+                        >
                           <CertificateTemplate
                             studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
                             title={genForm.title || 'Certificate Title'}
