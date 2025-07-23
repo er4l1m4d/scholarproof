@@ -51,15 +51,15 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ cert }) => {
   return (
     <div className={`relative border rounded p-4 shadow-sm bg-white flex flex-col gap-2 ${isRevoked ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-2">
-        <span className="font-semibold text-lg">{cert.title || 'Certificate'}</span>
+        <h2 className="text-lg font-black">{cert.title || 'Certificate'}</h2>
         {cert.sessions?.name && (
-          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded ml-2">
+          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded ml-2">
             {cert.sessions.name}
           </span>
         )}
         {cert.status && (
           <span
-            className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ml-2
+            className={`inline-block text-xs font-medium px-2 py-0.5 rounded ml-2
               ${
                 cert.status === 'Active'
                   ? 'bg-green-100 text-green-800'
@@ -77,12 +77,12 @@ const CertificateCard: React.FC<CertificateCardProps> = ({ cert }) => {
           </span>
         )}
         {isRevoked && (
-          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded font-bold" title="This certificate has been revoked by an admin.">
+          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded font-black" title="This certificate has been revoked by an admin.">
             Revoked
           </span>
         )}
       </div>
-      <div className="text-xs text-gray-400">Issued: {cert.created_at?.slice(0, 10) || 'N/A'}</div>
+      <div className="text-xs text-gray-400 font-medium">Issued: {cert.created_at?.slice(0, 10) || 'N/A'}</div>
       <div className="flex gap-2 mt-2 flex-wrap">
         <a
           href={isRevoked ? undefined : `/cert/${cert.id}`}

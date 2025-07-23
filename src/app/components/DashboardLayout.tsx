@@ -140,10 +140,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         style={{ minWidth: 256 }}
       >
         <div className="mb-8 flex items-center justify-between">
-          <span className="text-xl font-bold text-blue-800 dark:text-blue-200">ScholarProof</span>
+          <span className="text-xl font-black text-blue-800 dark:text-blue-200">ScholarProof</span>
           {/* Close button (all screens) */}
           <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto"
+            className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto font-medium"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
@@ -163,7 +163,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
                   }`}
                 >
                   {React.cloneElement(icons[tab.name as keyof typeof icons], { className: 'w-5 h-5 text-gray-900 dark:text-gray-100' })}
-                  <span>{tab.name}</span>
+                  <span className="font-medium">{tab.name}</span>
                 </Link>
               </li>
             ))}
@@ -183,19 +183,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
           <div className="flex items-center gap-4">
             {/* Hamburger for mobile */}
             <button
-              className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition font-medium"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
-              <span className="text-2xl">☰</span>
+              <span className="text-2xl font-black">0</span>
             </button>
-            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold">
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-black">
               {role.charAt(0).toUpperCase() + role.slice(1)}
             </span>
           </div>
           <div className="flex items-center gap-4">
             {/* Placeholder avatar */}
-            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-bold">
+            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-black">
               <span>{role.charAt(0).toUpperCase()}</span>
             </div>
             {/* Menu */}
@@ -226,7 +226,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowProfileModal(false)} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-bold mb-4 text-blue-800">Edit Profile</h3>
+            <h3 className="text-xl font-black mb-4 text-blue-800">Edit Profile</h3>
             <form onSubmit={handleProfileSave} className="space-y-4">
               <div>
                 <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Name</label>

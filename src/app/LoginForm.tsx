@@ -64,33 +64,33 @@ const LoginForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow font-sans">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">Login</h2>
+        <h2 className="text-2xl font-black mb-6 text-center text-gray-900 dark:text-gray-100">Login</h2>
         <div className="mb-4">
           <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
-          {errors.email && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{errors.email}</p>}
         </div>
         <div className="mb-4">
           <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100" htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
-          {errors.password && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.password}</p>}
+          {errors.password && <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{errors.password}</p>}
         </div>
-        <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition">Login</button>
-        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
+        <button type="submit" className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition font-medium">Login</button>
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300 font-medium">
           Don&apos;t have an account?{' '}
-          <a href="/signup" className="text-blue-700 dark:text-blue-300 hover:underline">Sign up here</a>
+          <a href="/signup" className="text-blue-700 dark:text-blue-300 hover:underline font-medium">Sign up here</a>
         </p>
       </form>
     </>
