@@ -63,6 +63,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   // Close menu on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -110,13 +111,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
   async function handleProfilePicUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFileName(file.name);
     setUploading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}.${fileExt}`;
-      // Upload to Supabase Storage
+      // Upload to Supabase Storage (ensure bucket name is correct)
       const { error: uploadError } = await supabase.storage.from('profile-pictures').upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
       // Get public URL
@@ -126,6 +128,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
     } catch (err: unknown) {
       if (err instanceof Error) {
         setProfileError(err.message);
+        console.error('Profile picture upload error:', err);
       } else {
         setProfileError('Failed to upload image');
       }
@@ -271,15 +274,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
             <h3 className="text-xl font-black mb-4 text-blue-800">Edit Profile</h3>
             <form onSubmit={handleProfileSave} className="space-y-4">
               <div className="flex flex-col items-center gap-2">
-                <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-black overflow-hidden">
+                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-black overflow-hidden">
                   {previewUrl ? (
                     <img src={previewUrl} alt="Profile Preview" className="w-full h-full object-cover rounded-full" />
                   ) : (
                     <span className="text-3xl">{role.charAt(0).toUpperCase()}</span>
                   )}
                 </div>
-                <input type="file" accept="image/*" onChange={handleProfilePicUpload} className="mt-2" disabled={uploading} />
-                {uploading && <div className="text-xs text-gray-500">Uploading...</div>}
+                <input
+                  id="profile-pic"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePicUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                <label
+                  htmlFor="profile-pic"
+                  className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium"
+                >
+                  {uploading ? "Uploading..." : "Choose Profile Picture"}
+                </label>
+                {selectedFileName && <span className="text-xs mt-1">{selectedFileName}</span>}
               </div>
               <div>
                 <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Name</label>
