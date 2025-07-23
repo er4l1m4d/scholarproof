@@ -2,7 +2,7 @@
 
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 // import toast from 'react-hot-toast';
 import CertificateTemplate from '../../../components/CertificateTemplate';
@@ -54,6 +54,12 @@ export default function AdminCertificatesPage() {
   const [style, setStyle] = useState('Elegant');
   const [showPreview, setShowPreview] = useState(false);
 
+  const CERT_WIDTH = 420;
+  const CERT_HEIGHT = 297;
+
+  const previewBoxRef = useRef<HTMLDivElement>(null);
+  const [certScale, setCertScale] = useState(1);
+
   useEffect(() => {
     if (role === 'admin') {
       fetchCertificates(page);
@@ -68,22 +74,26 @@ export default function AdminCertificatesPage() {
 
   useEffect(() => {
     function updateScale() {
-      setTimeout(() => {
-        const box = document.getElementById('certificate-scale')?.parentElement;
-        if (box && box.firstChild) {
-          const width = box.offsetWidth;
-          const height = box.offsetHeight;
-          let scale = 1;
-          if (width > 0 && height > 0) {
-            scale = Math.min(width / 420, height / 297);
-          }
-          (box.firstChild as HTMLElement).style.transform = `scale(${scale})`;
+      const box = previewBoxRef.current;
+      if (box) {
+        const width = box.offsetWidth;
+        const height = box.offsetHeight;
+        if (width > 0 && height > 0) {
+          setCertScale(Math.min(width / 420, height / 297));
         }
-      }, 0);
+      }
     }
     updateScale();
     window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    let observer: ResizeObserver | undefined;
+    if (previewBoxRef.current) {
+      observer = new ResizeObserver(updateScale);
+      observer.observe(previewBoxRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      if (observer && previewBoxRef.current) observer.disconnect();
+    };
   }, [showPreview]);
 
   async function fetchCertificates(pageNum: number) {
@@ -420,38 +430,35 @@ export default function AdminCertificatesPage() {
               {/* Preview Section */}
               <div className="bg-gray-50 rounded-lg p-6 flex flex-col">
                 <h2 className="text-lg font-semibold mb-4">Certificate Preview</h2>
-                <div className="flex-1 flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-lg min-h-[220px]">
-                  {showPreview ? (
-                    <div className="w-full flex justify-center">
-                      <div className="relative w-full max-w-[520px] aspect-[420/297] flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div
-                            id="certificate-scale"
-                            style={{
-                              width: '420px',
-                              height: '297px',
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              transformOrigin: 'top left',
-                            }}
-                          >
-                            <CertificateTemplate
-                              studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
-                              title={genForm.title || 'Certificate Title'}
-                              description={''}
-                              dateIssued={new Date().toLocaleDateString()}
-                              revoked={false}
-                            />
-                          </div>
-                        </div>
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-lg min-h-[220px]" ref={previewBoxRef} style={{ aspectRatio: '420/297' }}>
+                    {showPreview ? (
+                      <div
+                        style={{
+                          width: 420,
+                          height: 297,
+                          transform: `scale(${certScale})`,
+                          transformOrigin: 'top left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <CertificateTemplate
+                          studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
+                          title={genForm.title || 'Certificate Title'}
+                          description={''}
+                          dateIssued={new Date().toLocaleDateString()}
+                          revoked={false}
+                        />
                       </div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center p-4">
-                      Click &quot;Generate Preview&quot; to see your certificate.<br />
-                      Download generates a high-resolution PNG.
-                    </p>
-                  )}
+                    ) : (
+                      <p className="text-gray-500 text-center p-4">
+                        Click &quot;Generate Preview&quot; to see your certificate.<br />
+                        Download generates a high-resolution PNG.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
