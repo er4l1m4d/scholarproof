@@ -343,10 +343,10 @@ export default function AdminCertificatesPage() {
       )}
       {showGenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-4xl relative flex flex-row gap-8">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold" onClick={() => { setShowGenModal(false); setShowPreview(false); }} aria-label="Close">&times;</button>
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] relative flex flex-row gap-8 p-8 sm:p-4 overflow-y-auto sm:flex-col">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold z-10" onClick={() => { setShowGenModal(false); setShowPreview(false); }} aria-label="Close">&times;</button>
             {/* Left: Form and Details */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4 min-w-0">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
                 <div className="text-xs font-semibold text-blue-700 mb-1">Domain Owner</div>
                 <div className="text-lg font-bold text-blue-900">{studentsList.find(s => s.id === genForm.studentId)?.name || 'Select a student'}</div>
@@ -395,16 +395,22 @@ export default function AdminCertificatesPage() {
               </div>
             </div>
             {/* Right: Certificate Preview */}
-            <div className="flex-1 flex flex-col">
-              <div className="border border-gray-300 rounded-lg bg-gray-50 flex-1 flex items-center justify-center min-h-[400px]">
+            <div className="flex-1 flex flex-col min-w-0">
+              <div className="border border-gray-300 rounded-lg bg-gray-50 flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[200px] overflow-auto">
                 {showPreview ? (
-                  <CertificateTemplate
-                    studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
-                    title={genForm.title || 'Certificate Title'}
-                    description={''}
-                    dateIssued={new Date().toLocaleDateString()}
-                    revoked={false}
-                  />
+                  <div className="w-full flex justify-center">
+                    <div className="max-w-full" style={{ width: '100%', minWidth: 0 }}>
+                      <div className="sm:scale-75 scale-100 origin-top sm:max-w-[90vw]">
+                        <CertificateTemplate
+                          studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
+                          title={genForm.title || 'Certificate Title'}
+                          description={''}
+                          dateIssued={new Date().toLocaleDateString()}
+                          revoked={false}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-gray-400 text-center">Click &quot;Generate Preview&quot; to see your certificate.</div>
                 )}
