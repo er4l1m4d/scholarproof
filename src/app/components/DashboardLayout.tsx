@@ -144,7 +144,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
       setProfileLoading(false);
       return;
     }
-    const updateData: any = { name: profileName };
+    // Replace 'any' with a specific type
+    const updateData: Record<string, string | null> = { name: profileName };
     if (profilePictureUrl) updateData.profile_picture_url = profilePictureUrl;
     const { error: updateError } = await supabase.from('users').update(updateData).eq('id', user.id);
     if (updateError) {
