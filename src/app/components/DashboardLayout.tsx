@@ -122,8 +122,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
       const { data } = supabase.storage.from('profile-pictures').getPublicUrl(filePath);
       setPreviewUrl(data.publicUrl);
       setProfilePictureUrl(data.publicUrl);
-    } catch (err: any) {
-      setProfileError(err.message || 'Failed to upload image');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setProfileError(err.message);
+      } else {
+        setProfileError('Failed to upload image');
+      }
     } finally {
       setUploading(false);
     }
