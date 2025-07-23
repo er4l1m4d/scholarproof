@@ -68,14 +68,18 @@ export default function AdminCertificatesPage() {
 
   useEffect(() => {
     function updateScale() {
-      const box = document.getElementById('certificate-scale')?.parentElement;
-      if (box && box.firstChild) {
-        const scale = Math.min(
-          box.offsetWidth / 420,
-          box.offsetHeight / 297
-        );
-        (box.firstChild as HTMLElement).style.transform = `scale(${scale})`;
-      }
+      setTimeout(() => {
+        const box = document.getElementById('certificate-scale')?.parentElement;
+        if (box && box.firstChild) {
+          const width = box.offsetWidth;
+          const height = box.offsetHeight;
+          let scale = 1;
+          if (width > 0 && height > 0) {
+            scale = Math.min(width / 420, height / 297);
+          }
+          (box.firstChild as HTMLElement).style.transform = `scale(${scale})`;
+        }
+      }, 0);
     }
     updateScale();
     window.addEventListener('resize', updateScale);
@@ -358,90 +362,100 @@ export default function AdminCertificatesPage() {
       )}
       {showGenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] relative flex flex-row gap-8 p-8 sm:p-4 overflow-y-auto sm:flex-col">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl font-bold z-10" onClick={() => { setShowGenModal(false); setShowPreview(false); }} aria-label="Close">&times;</button>
-            {/* Left: Form and Details */}
-            <div className="flex-1 flex flex-col gap-4 min-w-0">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
-                <div className="text-xs font-semibold text-blue-700 mb-1">Domain Owner</div>
-                <div className="text-lg font-bold text-blue-900">{studentsList.find(s => s.id === genForm.studentId)?.name || 'Select a student'}</div>
-                <div className="text-xs text-gray-500 mt-1">This will appear as the certificate owner</div>
-              </div>
-              <form onSubmit={handleGeneratePreview} className="flex flex-col gap-4">
-                <div>
-                  <label className="block mb-1 font-medium">Certificate Style</label>
-                  <select className="w-full border rounded px-3 py-2" value={style} onChange={e => setStyle(e.target.value)}>
-                    <option value="Elegant">Elegant</option>
-                    <option value="Classic">Classic</option>
-                    <option value="Modern">Modern</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Session</label>
-                  <select className="w-full border rounded px-3 py-2" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
-                    <option value="">Select session</option>
-                    {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Student</label>
-                  <select className="w-full border rounded px-3 py-2" value={genForm.studentId} onChange={e => handleGenStudentChange(e.target.value)} required disabled={!genForm.sessionId}>
-                    <option value="">Select student</option>
-                    {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Certificate Title</label>
-                  <input type="text" className="w-full border rounded px-3 py-2" value={genForm.title} onChange={handleGenTitleChange} required />
-                </div>
-                <button type="submit" className="w-full bg-cyan-400 text-white py-2 rounded font-semibold hover:bg-cyan-500 transition">Generate Preview</button>
-              </form>
-              {/* Certificate Details */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-2">
-                <div className="text-xs font-semibold text-blue-700 mb-1">Certificate Details</div>
-                <div className="text-sm text-gray-900"><b>Name:</b> {studentsList.find(s => s.id === genForm.studentId)?.name || '-'}</div>
-                <div className="text-sm text-gray-900"><b>Date Created:</b> {new Date().toLocaleDateString()}</div>
-                <div className="text-sm text-gray-900"><b>Type:</b> ScholarProof Certificate</div>
-                <div className="text-sm text-gray-900"><b>Status:</b> Active</div>
-              </div>
+          <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden relative">
+            {/* Header */}
+            <div className="bg-blue-700 text-white p-6">
+              <h1 className="text-2xl font-bold">Generate Certificate</h1>
             </div>
-            {/* Right: Certificate Preview */}
-            <div className="flex-1 flex flex-col min-w-0">
-              <div className="flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[200px]">
-                {showPreview ? (
-                  <div className="w-full flex justify-center">
-                    <div
-                      className="relative w-full max-w-[520px] aspect-[420/297] bg-gray-50 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden"
-                    >
-                      <div
-                        className="absolute inset-0 flex items-center justify-center"
-                      >
-                        <div
-                          id="certificate-scale"
-                          style={{
-                            width: '420px',
-                            height: '297px',
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            transformOrigin: 'top left',
-                          }}
-                        >
-                          <CertificateTemplate
-                            studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
-                            title={genForm.title || 'Certificate Title'}
-                            description={''}
-                            dateIssued={new Date().toLocaleDateString()}
-                            revoked={false}
-                          />
+            {/* Main Content */}
+            <div className="grid md:grid-cols-2 gap-8 p-6">
+              {/* Form Section */}
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Domain Owner</h2>
+                  <div className="w-full p-3 border border-gray-300 rounded bg-gray-50 font-semibold text-gray-800">{studentsList.find(s => s.id === genForm.studentId)?.name || 'Select a student'}</div>
+                  <p className="text-sm text-gray-500 mt-1">This will appear as the certificate owner</p>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Certificate Style</h2>
+                  <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-700" value={style} onChange={e => setStyle(e.target.value)}>
+                    <option value="Elegant">Elegant</option>
+                    <option value="Modern">Modern</option>
+                    <option value="Classic">Classic</option>
+                  </select>
+                </div>
+                <form onSubmit={handleGeneratePreview} className="space-y-4">
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Session</h2>
+                    <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-700" value={genForm.sessionId} onChange={e => handleGenSessionChange(e.target.value)} required>
+                      <option value="">Select session</option>
+                      {sessionsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Student</h2>
+                    <select className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-700" value={genForm.studentId} onChange={e => handleGenStudentChange(e.target.value)} required disabled={!genForm.sessionId}>
+                      <option value="">Select student</option>
+                      {studentsList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Certificate Title</h2>
+                    <input type="text" className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-700" value={genForm.title} onChange={handleGenTitleChange} required />
+                  </div>
+                  <div className="flex gap-4 pt-4">
+                    <button type="submit" className="px-6 py-3 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-semibold w-full">Generate Preview</button>
+                  </div>
+                </form>
+                <div className="pt-4 border-t border-gray-200">
+                  <h2 className="text-lg font-semibold mb-2">Certificate Details</h2>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="font-medium">Name:</span> {studentsList.find(s => s.id === genForm.studentId)?.name || '-'}</p>
+                    <p><span className="font-medium">Date Created:</span> {new Date().toLocaleDateString()}</p>
+                    <p><span className="font-medium">Type:</span> ScholarProof Certificate</p>
+                    <p><span className="font-medium">Status:</span> Active</p>
+                  </div>
+                </div>
+              </div>
+              {/* Preview Section */}
+              <div className="bg-gray-50 rounded-lg p-6 flex flex-col">
+                <h2 className="text-lg font-semibold mb-4">Certificate Preview</h2>
+                <div className="flex-1 flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-lg min-h-[220px]">
+                  {showPreview ? (
+                    <div className="w-full flex justify-center">
+                      <div className="relative w-full max-w-[520px] aspect-[420/297] flex items-center justify-center overflow-hidden">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div
+                            id="certificate-scale"
+                            style={{
+                              width: '420px',
+                              height: '297px',
+                              maxWidth: '100%',
+                              maxHeight: '100%',
+                              transformOrigin: 'top left',
+                            }}
+                          >
+                            <CertificateTemplate
+                              studentName={studentsList.find(s => s.id === genForm.studentId)?.name || 'Student Name'}
+                              title={genForm.title || 'Certificate Title'}
+                              description={''}
+                              dateIssued={new Date().toLocaleDateString()}
+                              revoked={false}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-gray-400 text-center">Click &quot;Generate Preview&quot; to see your certificate.</div>
-                )}
+                  ) : (
+                    <p className="text-gray-500 text-center p-4">
+                      Click &quot;Generate Preview&quot; to see your certificate.<br />
+                      Download generates a high-resolution PNG.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10" onClick={() => { setShowGenModal(false); setShowPreview(false); }} aria-label="Close">&times;</button>
           </div>
         </div>
       )}
