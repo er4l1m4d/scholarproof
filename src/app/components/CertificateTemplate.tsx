@@ -5,8 +5,6 @@ interface CertificateTemplateProps {
   title: string;
   description?: string;
   dateIssued: string;
-  institutionName?: string;
-  institutionLogoUrl?: string;
   revoked?: boolean;
 }
 
@@ -15,8 +13,6 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
   title,
   description,
   dateIssued,
-  institutionName,
-  institutionLogoUrl,
   revoked = false,
 }) => {
   return (

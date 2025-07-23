@@ -4,7 +4,6 @@ import DashboardLayout from '../../../components/DashboardLayout';
 import { useUserRole } from '@/app/hooks/useUserRole';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
-import Link from 'next/link';
 import toast from 'react-hot-toast';
 import CertificateTemplate from '../../../components/CertificateTemplate';
 
@@ -52,9 +51,6 @@ export default function AdminCertificatesPage() {
   const [sessionsList, setSessionsList] = useState<SessionOption[]>([]);
   const [studentsList, setStudentsList] = useState<StudentOption[]>([]);
   const [genForm, setGenForm] = useState({ sessionId: '', studentId: '', title: '' });
-  const [genLoading, setGenLoading] = useState(false);
-  const [genError, setGenError] = useState('');
-  const [previewData, setPreviewData] = useState({ sessionName: '', studentName: '', title: '' });
   const [accentColor, setAccentColor] = useState('#2563eb'); // Nice blue
   const [style, setStyle] = useState('Elegant');
   const [showPreview, setShowPreview] = useState(false);
@@ -177,56 +173,21 @@ export default function AdminCertificatesPage() {
   function openGenModal() {
     setShowGenModal(true);
     setGenForm({ sessionId: '', studentId: '', title: '' });
-    setGenError('');
     setStudentsList([]);
-    setPreviewData({ sessionName: '', studentName: '', title: '' });
   }
 
   async function handleGenSessionChange(sessionId: string) {
     setGenForm(f => ({ ...f, sessionId, studentId: '' }));
     await fetchStudentsList(sessionId);
     const session = sessionsList.find(s => s.id === sessionId);
-    setPreviewData(prev => ({ ...prev, sessionName: session ? session.name : '' }));
-  }
-
-  async function handleGenerateCert(e: React.FormEvent) {
-    e.preventDefault();
-    setGenLoading(true);
-    setGenError('');
-    if (!genForm.sessionId || !genForm.studentId || !genForm.title) {
-      setGenError('All fields are required.');
-      toast.error('All fields are required.');
-      setGenLoading(false);
-      return;
-    }
-    const { error } = await supabase.from('certificates').insert({
-      session_id: genForm.sessionId,
-      student_id: genForm.studentId,
-      title: genForm.title,
-      status: 'Active',
-    });
-    if (error) {
-      setGenError(error.message);
-      toast.error('Failed to create certificate: ' + error.message);
-    } else {
-      setShowGenModal(false);
-      setGenForm({ sessionId: '', studentId: '', title: '' });
-      setPreviewData({ sessionName: '', studentName: '', title: '' });
-      setPage(1); // Always go to first page after insert
-      fetchCertificates(1); // Fetch first page to show newest
-      toast.success('Certificate created successfully!');
-    }
-    setGenLoading(false);
   }
 
   function handleGenStudentChange(studentId: string) {
     setGenForm(f => ({ ...f, studentId }));
     const student = studentsList.find(s => s.id === studentId);
-    setPreviewData(prev => ({ ...prev, studentName: student ? student.name : '' }));
   }
   function handleGenTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setGenForm(f => ({ ...f, title: e.target.value }));
-    setPreviewData(prev => ({ ...prev, title: e.target.value }));
   }
 
   function handleGeneratePreview(e: React.FormEvent) {
@@ -448,7 +409,7 @@ export default function AdminCertificatesPage() {
                     revoked={false}
                   />
                 ) : (
-                  <div className="text-gray-400 text-center">Click "Generate Preview" to see your certificate.</div>
+                  <div className="text-gray-400 text-center">Click &quot;Generate Preview&quot; to see your certificate.</div>
                 )}
               </div>
             </div>
