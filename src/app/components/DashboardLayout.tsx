@@ -191,14 +191,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         {/* Topbar */}
         <header className="h-16 bg-white dark:bg-gray-900 border-b flex items-center justify-between px-8">
           <div className="flex items-center gap-4">
-            <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="h-8 w-8 mr-2 inline-block align-middle" />
-            {/* Hamburger for mobile */}
             <button
               className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition font-medium"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
-              <img src="/ScholarProof Logo.png" alt="Open sidebar" className="h-8 w-8" />
+              <img src="/ScholarProof Logo.png" alt="Open sidebar" className="h-8 w-8 transition-transform duration-200 hover:scale-110" />
             </button>
             <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:text-[#0a0a0a] text-sm font-black">
               {role.charAt(0).toUpperCase() + role.slice(1)}
