@@ -149,7 +149,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         style={{ minWidth: 256 }}
       >
         <div className="mb-8 flex items-center justify-between">
-          <span className="text-xl font-black text-[#174AE6] dark:text-[#0a0a0a]">ScholarProof</span>
+          <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="h-8 w-8 mr-2 inline-block align-middle" />
+          <span className="text-xl font-black text-[#174AE6] dark:text-[#0a0a0a] align-middle">ScholarProof</span>
           {/* Close button (all screens) */}
           <button
             className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto font-medium"
@@ -190,6 +191,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         {/* Topbar */}
         <header className="h-16 bg-white dark:bg-gray-900 border-b flex items-center justify-between px-8">
           <div className="flex items-center gap-4">
+            <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="h-8 w-8 mr-2 inline-block align-middle" />
             {/* Hamburger for mobile */}
             <button
               className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition font-medium"

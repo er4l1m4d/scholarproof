@@ -4,6 +4,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 font-sans">
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md text-center">
+        <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="mx-auto mb-4 h-16 w-16" />
         <h1 className="text-3xl font-black mb-4 text-[#174AE6] dark:text-[#0a0a0a]">Welcome to ScholarProof</h1>
         <p className="mb-8 text-gray-600 dark:text-[#0a0a0a] font-medium">Secure, verifiable academic documents for students and staff.</p>
         <div className="flex flex-col gap-4">

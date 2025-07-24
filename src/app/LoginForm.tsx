@@ -64,6 +64,7 @@ const LoginForm = () => {
   return (
     <>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow font-sans">
+        <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="mx-auto mb-4 h-12 w-12" />
         <h2 className="text-2xl font-black mb-6 text-center text-[#174AE6] dark:text-[#0a0a0a]">Login</h2>
         <div className="mb-4">
           <label className="block mb-1 font-medium text-gray-900 dark:text-[#0a0a0a]" htmlFor="email">Email</label>
