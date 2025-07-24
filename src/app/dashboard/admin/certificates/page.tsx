@@ -31,7 +31,7 @@ export default function AdminCertificatesPage() {
     try {
       const { data, error } = await supabase
         .from("certificates")
-        .select("*, students:student_id(full_name), sessions:session_id(name)")
+        .select("*, student:student_id(name), sessions:session_id(name)")
         .order("uploaded_at", { ascending: false });
       if (error) throw error;
       setCertificates(
@@ -39,7 +39,7 @@ export default function AdminCertificatesPage() {
           const c = cert as Record<string, unknown>;
           return {
             ...c,
-            student_name: (c.students as { full_name?: string } | undefined)?.full_name,
+            student_name: (c.student as { name?: string } | undefined)?.name,
             session_name: (c.sessions as { name?: string } | undefined)?.name,
           } as Certificate;
         })
