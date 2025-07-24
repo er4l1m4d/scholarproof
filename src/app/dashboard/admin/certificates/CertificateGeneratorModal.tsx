@@ -201,6 +201,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
                   description={formValues.description || "This certificate is awarded to the student for successfully completing the course."}
                   dateIssued={formValues.dateIssued || new Date().toISOString()}
                   revoked={false}
+                  sessionName={sessions.find((sess) => sess.id === formValues.sessionId)?.name || undefined}
                 />
               </div>
             </div>

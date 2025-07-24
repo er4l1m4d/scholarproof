@@ -6,6 +6,7 @@ interface CertificateTemplateProps {
   description?: string;
   dateIssued: string;
   revoked?: boolean;
+  sessionName?: string;
 }
 
 const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
@@ -14,6 +15,7 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
   description,
   dateIssued,
   revoked = false,
+  sessionName,
 }) => {
   return (
     <div
@@ -37,10 +39,10 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
         <div className="text-xl tracking-widest text-gray-700 mb-6 uppercase">of Completion</div>
         {/* Subtitle */}
         <div className="text-base tracking-wide text-gray-700 mb-6 uppercase">This certificate is proudly presented to</div>
-        {/* Recipient Name (Script font) */}
+        {/* Recipient Name (Elegant font) */}
         <div
           className="mb-4 text-5xl font-bold text-center"
-          style={{ fontFamily: 'cursive, "Dancing Script", "Great Vibes", serif' }}
+          style={{ fontFamily: 'Garam Simon SB Roman OsF, Garamond, serif' }} // To use the custom font, import it in your global CSS
         >
           {studentName}
         </div>
@@ -50,7 +52,10 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
             'For outstanding completion and achievement. We recognize your dedication and hard work.'}
         </div>
         {/* Title (e.g., course or award) */}
-        <div className="text-lg text-center font-semibold mb-8">{title}</div>
+        <div className="text-lg text-center font-semibold mb-2">{title}</div>
+        {sessionName && (
+          <div className="text-md text-center text-gray-600 mb-8 italic">Session: {sessionName}</div>
+        )}
         {/* Date, Seal, Signature */}
         <div className="flex items-end justify-between w-full mt-12 px-16">
           <div className="flex flex-col items-center">
