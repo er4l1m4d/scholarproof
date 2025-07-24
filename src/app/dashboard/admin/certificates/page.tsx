@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/app/supabaseClient";
 import DashboardLayout from "@/app/components/DashboardLayout";
 import CertificateGeneratorModal from "./CertificateGeneratorModal";
+import useSWR, { mutate } from "swr";
 
 interface Certificate {
   id: string;
@@ -19,48 +20,29 @@ interface Certificate {
   session_name?: string;
 }
 
+const fetcher = async (url: string) => {
+  const { data, error } = await supabase
+    .from(url.split("/")[2]) // Extract table name from URL
+    .select("*, student:student_id(name), sessions:session_id(name)")
+    .order("uploaded_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((cert: any) => ({
+    ...cert,
+    student_name: cert.student?.name,
+    session_name: cert.sessions?.name,
+  }));
+};
+
 export default function AdminCertificatesPage() {
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: certificates = [], error, isLoading } = useSWR("certificates", fetcher);
   const [modalOpen, setModalOpen] = useState(false);
-
-  const fetchCertificates = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase
-        .from("certificates")
-        .select("*, student:student_id(name), sessions:session_id(name)")
-        .order("uploaded_at", { ascending: false });
-      if (error) throw error;
-      setCertificates(
-        (data || []).map((cert) => {
-          const c = cert as Record<string, unknown>;
-          return {
-            ...c,
-            student_name: (c.student as { name?: string } | undefined)?.name,
-            session_name: (c.sessions as { name?: string } | undefined)?.name,
-          } as Certificate;
-        })
-      );
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to fetch certificates");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
 
   return (
     <DashboardLayout role="admin">
       <CertificateGeneratorModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSuccess={fetchCertificates}
+        onSuccess={() => mutate("certificates")}
       />
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -72,10 +54,10 @@ export default function AdminCertificatesPage() {
             + New Certificate
           </button>
         </div>
-        {loading ? (
+        {isLoading ? (
           <div>Loading...</div>
         ) : error ? (
-          <div className="text-red-500">{error}</div>
+          <div className="text-red-500">{error.message || error.toString()}</div>
         ) : certificates.length === 0 ? (
           <div>No certificates found.</div>
         ) : (
@@ -91,7 +73,7 @@ export default function AdminCertificatesPage() {
                 </tr>
               </thead>
               <tbody>
-                {certificates.map((cert) => (
+                {certificates.map((cert: any) => (
                   <tr key={cert.id} className="border-t hover:bg-gray-50">
                     <td className="py-2 px-4">{cert.student_name || cert.student_id}</td>
                     <td className="py-2 px-4">{cert.session_name || cert.session_id}</td>
