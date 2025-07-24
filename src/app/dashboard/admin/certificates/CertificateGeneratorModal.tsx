@@ -197,8 +197,8 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
                   studentName={
                     students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
                   }
-                  title={formValues.title || "Certificate Title"}
-                  description={formValues.description || "Certificate description will appear here."}
+                  title={formValues.title || "Course Title"}
+                  description={formValues.description || "This certificate is awarded to the student for successfully completing the course."}
                   dateIssued={formValues.dateIssued || new Date().toISOString()}
                   revoked={false}
                 />
