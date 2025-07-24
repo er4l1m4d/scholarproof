@@ -186,18 +186,35 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
             )}
           </div>
           {/* Right: Live Preview */}
-          <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px]">
+          <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px] h-[500px] md:h-[600px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Certificate Preview</h2>
-            <div className="w-full max-w-xl mx-auto bg-white p-4 rounded shadow overflow-auto">
-              <CertificateTemplate
-                studentName={
-                  students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
-                }
-                title={formValues.title || "Certificate Title"}
-                description={formValues.description || "Certificate description will appear here."}
-                dateIssued={formValues.dateIssued || new Date().toISOString()}
-                revoked={false}
-              />
+            <div className="w-full max-w-xl mx-auto bg-white p-4 rounded shadow flex items-center justify-center h-full overflow-hidden">
+              {/* Fixed preview size and scaling */}
+              <div
+                style={{
+                  width: 700,
+                  height: 400,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transform: 'scale(0.7)', // Adjust scale as needed
+                  transformOrigin: 'top left',
+                  background: 'white',
+                  borderRadius: '0.5rem',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  overflow: 'hidden',
+                }}
+              >
+                <CertificateTemplate
+                  studentName={
+                    students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
+                  }
+                  title={formValues.title || "Certificate Title"}
+                  description={formValues.description || "Certificate description will appear here."}
+                  dateIssued={formValues.dateIssued || new Date().toISOString()}
+                  revoked={false}
+                />
+              </div>
             </div>
           </div>
         </div>
