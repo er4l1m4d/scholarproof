@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/supabaseClient";
 import DashboardLayout from "@/app/components/DashboardLayout";
+import CertificateGeneratorModal from "./CertificateGeneratorModal";
 
 interface Certificate {
   id: string;
@@ -22,47 +23,54 @@ export default function AdminCertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const fetchCertificates = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from("certificates")
+        .select("*, students:student_id(full_name), sessions:session_id(name)")
+        .order("uploaded_at", { ascending: false });
+      if (error) throw error;
+      setCertificates(
+        (data || []).map((cert) => {
+          const c = cert as Record<string, unknown>;
+          return {
+            ...c,
+            student_name: (c.students as { full_name?: string } | undefined)?.full_name,
+            session_name: (c.sessions as { name?: string } | undefined)?.name,
+          } as Certificate;
+        })
+      );
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to fetch certificates");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCertificates = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, error } = await supabase
-          .from("certificates")
-          .select("*, students:student_id(full_name), sessions:session_id(name)")
-          .order("uploaded_at", { ascending: false });
-        if (error) throw error;
-        setCertificates(
-          (data || []).map((cert) => {
-            const c = cert as Record<string, unknown>;
-            return {
-              ...c,
-              student_name: (c.students as { full_name?: string } | undefined)?.full_name,
-              session_name: (c.sessions as { name?: string } | undefined)?.name,
-            } as Certificate;
-          })
-        );
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Failed to fetch certificates");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCertificates();
   }, []);
 
   return (
     <DashboardLayout role="admin">
+      <CertificateGeneratorModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={fetchCertificates}
+      />
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">All Certificates</h1>
-          <Link
-            href="/dashboard/admin/certificates/new"
+          <button
+            onClick={() => setModalOpen(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
           >
             + New Certificate
-          </Link>
+          </button>
         </div>
         {loading ? (
           <div>Loading...</div>
