@@ -19,8 +19,8 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
 }) => {
   return (
     <div
-      className="relative bg-white mx-auto font-sans print:max-w-full print:shadow-none print:border-0 print:p-4 flex flex-col justify-between"
-      style={{ width: '1123px', height: '794px', padding: '48px' }} // A4 landscape at 96dpi
+      className="relative mx-auto font-sans print:max-w-full print:shadow-none print:border-0 print:p-4 flex flex-col justify-between"
+      style={{ width: '1123px', height: '794px', padding: '48px', backgroundColor: '#fff', color: '#171717' }} // A4 landscape at 96dpi, force supported colors
     >
       {/* Double Border with Corner Accents */}
       <div className="absolute inset-0 pointer-events-none select-none">

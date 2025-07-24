@@ -43,12 +43,20 @@ export default function AdminCertificatesPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">All Certificates</h1>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
-          >
-            + New Certificate
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => mutate("certificates")}
+              className="bg-gray-200 px-3 py-2 rounded font-semibold hover:bg-gray-300 transition"
+            >
+              Refresh Table
+            </button>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
+            >
+              + New Certificate
+            </button>
+          </div>
         </div>
         {isLoading ? (
           <div>Loading...</div>
