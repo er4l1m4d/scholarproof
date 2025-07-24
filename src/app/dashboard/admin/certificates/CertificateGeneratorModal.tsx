@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,9 +38,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const previewContainerRef = useRef<HTMLDivElement>(null);
-  const certRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  // Removed previewContainerRef, certRef, and scale state
 
   const {
     register,
@@ -87,21 +85,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
     fetchData();
   }, [open]);
 
-  // Dynamic scaling effect
-  useEffect(() => {
-    if (!open) return;
-    function updateScale() {
-      if (!previewContainerRef.current || !certRef.current) return;
-      const container = previewContainerRef.current.getBoundingClientRect();
-      const cert = certRef.current.getBoundingClientRect();
-      const scaleWidth = container.width / cert.width;
-      const scaleHeight = container.height / cert.height;
-      setScale(Math.min(scaleWidth, scaleHeight, 1));
-    }
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, [open, formValues]);
+  // Removed dynamic scaling effect useEffect
 
   const onSubmit = (data: FormData) => {
     // TODO: Implement actual certificate creation logic
@@ -207,27 +191,8 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
           {/* Right: Live Preview */}
           <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px] h-[500px] md:h-[600px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Certificate Preview</h2>
-            <div
-              ref={previewContainerRef}
-              className="w-full max-w-xl mx-auto bg-white p-4 rounded shadow flex items-center justify-center h-full overflow-hidden"
-              style={{ position: 'relative' }}
-            >
-              <div
-                ref={certRef}
-                style={{
-                  transform: `scale(${scale})`,
-                  transformOrigin: 'top left',
-                  width: 700,
-                  height: 400,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'white',
-                  borderRadius: '0.5rem',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                  overflow: 'hidden',
-                }}
-              >
+            <div className="relative w-full h-[500px] border rounded-lg bg-white overflow-hidden">
+              <div className="absolute top-1/2 left-1/2 origin-center scale-[0.6] -translate-x-1/2 -translate-y-1/2">
                 <CertificateTemplate
                   studentName={
                     students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
