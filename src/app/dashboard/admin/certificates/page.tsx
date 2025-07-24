@@ -18,20 +18,15 @@ interface Certificate {
   uploaded_at: string;
   users?: { name?: string };
   sessions?: { name?: string };
-  session_name?: string;
 }
 
 const fetcher = async (url: string): Promise<Certificate[]> => {
   const { data, error } = await supabase
-    .from(url.split("/")[2]) // Extract table name from URL
+    .from("certificates")
     .select("*, users(name), sessions:session_id(name)")
     .order("uploaded_at", { ascending: false });
   if (error) throw error;
-  return (data || []).map((cert: Certificate) => ({
-    ...cert,
-    student_name: cert.users?.name,
-    session_name: cert.sessions?.name,
-  }));
+  return data || [];
 };
 
 export default function AdminCertificatesPage() {
@@ -79,7 +74,7 @@ export default function AdminCertificatesPage() {
                 {certificates.map((cert: Certificate) => (
                   <tr key={cert.id} className="border-t hover:bg-gray-50">
                     <td className="py-2 px-4">{cert.users?.name || cert.student_id}</td>
-                    <td className="py-2 px-4">{cert.session_name || cert.session_id}</td>
+                    <td className="py-2 px-4">{cert.sessions?.name || cert.session_id}</td>
                     <td className="py-2 px-4">
                       <Link href={`/dashboard/admin/certificates/${cert.id}`} className="text-blue-700 underline font-medium">
                         {cert.title}
