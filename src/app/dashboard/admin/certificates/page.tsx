@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/supabaseClient";
 import DashboardLayout from "@/app/components/DashboardLayout";
@@ -18,15 +18,17 @@ interface Certificate {
   uploaded_at: string;
   student_name?: string;
   session_name?: string;
+  student?: { name?: string };
+  sessions?: { name?: string };
 }
 
-const fetcher = async (url: string) => {
+const fetcher = async (url: string): Promise<Certificate[]> => {
   const { data, error } = await supabase
     .from(url.split("/")[2]) // Extract table name from URL
     .select("*, student:student_id(name), sessions:session_id(name)")
     .order("uploaded_at", { ascending: false });
   if (error) throw error;
-  return (data || []).map((cert: any) => ({
+  return (data || []).map((cert: Certificate) => ({
     ...cert,
     student_name: cert.student?.name,
     session_name: cert.sessions?.name,
@@ -34,7 +36,7 @@ const fetcher = async (url: string) => {
 };
 
 export default function AdminCertificatesPage() {
-  const { data: certificates = [], error, isLoading } = useSWR("certificates", fetcher);
+  const { data: certificates = [], error, isLoading } = useSWR<Certificate[]>("certificates", fetcher);
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -73,7 +75,7 @@ export default function AdminCertificatesPage() {
                 </tr>
               </thead>
               <tbody>
-                {certificates.map((cert: any) => (
+                {certificates.map((cert: Certificate) => (
                   <tr key={cert.id} className="border-t hover:bg-gray-50">
                     <td className="py-2 px-4">{cert.student_name || cert.student_id}</td>
                     <td className="py-2 px-4">{cert.session_name || cert.session_id}</td>
