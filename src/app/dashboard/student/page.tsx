@@ -14,19 +14,12 @@ type CertificateSummary = {
   session?: { id: string; name: string };
 };
 
-type SessionSummary = {
-  id: string;
-  name: string;
-  date: string;
-};
-
 type RawCertificate = Omit<CertificateSummary, 'session'> & { session?: { id: string; name: string }[] | { id: string; name: string } };
 
 export default function StudentDashboard() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [sessionFilter, setSessionFilter] = useState<string>('all');
   const [certificates, setCertificates] = useState<CertificateSummary[]>([]);
-  const [sessions, setSessions] = useState<SessionSummary[]>([]); // Placeholder for upcoming sessions
   const [name, setName] = useState<string | null>(null);
 
   // Dynamically extract unique sessions from certificates
@@ -59,40 +52,6 @@ export default function StudentDashboard() {
   }
   fetchCertificates();
 }, []);
-
-  // Fetch upcoming sessions (only those created by admin and with status 'Active')
-  useEffect(() => {
-    async function fetchSessions() {
-      const { data, error } = await supabase
-        .from('sessions')
-        .select('id, name, start_date')
-        .eq('status', 'Active')
-        .order('start_date', { ascending: true });
-      if (!error && data) {
-        setSessions(
-          data.map((s: { id: string; name: string; start_date?: string }) => ({
-            id: s.id,
-            name: s.name,
-            date: s.start_date ? new Date(s.start_date).toLocaleDateString() : ''
-          }))
-        );
-      } else {
-        setSessions([]);
-      }
-    }
-    fetchSessions();
-  }, []);
-
-  useEffect(() => {
-    async function fetchName() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase.from('users').select('name').eq('id', user.id).single();
-        setName(data?.name || null);
-      }
-    }
-    fetchName();
-  }, []);
 
   // Filter and sort certificates
   const displayedCertificates = useMemo(() => {
@@ -158,17 +117,8 @@ export default function StudentDashboard() {
       <div className="mb-8 w-full max-w-3xl mx-auto">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Upcoming Sessions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {sessions.length === 0 ? (
-            <div className="col-span-3 text-gray-400 dark:text-gray-500">No upcoming sessions.</div>
-          ) : (
-            sessions.map(s => (
-              <div key={s.id} className="bg-gray-50 dark:bg-gray-800 rounded p-4 shadow flex flex-col items-center">
-                <div className="font-bold text-blue-800 dark:text-blue-200 mb-1">{s.name}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{s.date}</div>
-                <button className="text-xs px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 transition font-medium mt-2">Details</button>
-              </div>
-            ))
-          )}
+          {/* Placeholder for upcoming sessions */}
+          <div className="col-span-3 text-gray-400 dark:text-gray-500">Upcoming sessions will be displayed here.</div>
         </div>
       </div>
       <div className="w-full max-w-3xl bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md">
