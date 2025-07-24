@@ -33,13 +33,13 @@ export default function CertificateDetailPage() {
         // Fetch certificate
         const { data, error } = await supabase
           .from("certificates")
-          .select("*, students:student_id(full_name), sessions:session_id(name)")
+          .select("*, student:student_id(name), sessions:session_id(name)")
           .eq("id", id)
           .single();
         if (error || !data) throw error || new Error("Certificate not found");
         setCertificate({
           ...data,
-          student_name: data.students?.full_name,
+          student_name: data.student?.name,
           session_name: data.sessions?.name,
         });
       } catch (err: unknown) {
@@ -82,6 +82,7 @@ export default function CertificateDetailPage() {
         description={certificate.description}
         dateIssued={certificate.uploaded_at}
         revoked={certificate.revoked}
+        sessionName={certificate.session_name}
       />
       <div className="flex gap-4 mt-8 items-center">
         <button
@@ -109,4 +110,4 @@ export default function CertificateDetailPage() {
       </div>
     </div>
   );
-} 
+}
