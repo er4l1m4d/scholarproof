@@ -192,7 +192,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
           <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px] h-[500px] md:h-[600px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Certificate Preview</h2>
             <div className="relative w-full h-[500px] border rounded-lg bg-white overflow-hidden">
-              <div className="absolute top-1/2 left-1/2 origin-center scale-[0.6] -translate-x-1/2 -translate-y-1/2">
+              <div className="absolute top-1/2 left-1/2 origin-center scale-[0.4] -translate-x-1/2 -translate-y-1/2">
                 <CertificateTemplate
                   studentName={
                     students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
