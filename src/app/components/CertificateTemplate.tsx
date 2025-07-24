@@ -35,10 +35,10 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full px-8">
         {/* Heading */}
-        <h1 className="text-5xl font-extrabold tracking-widest text-blue-800 mb-2 uppercase">Certificate</h1>
-        <div className="text-xl tracking-widest text-gray-700 mb-6 uppercase">of Completion</div>
+        <h1 className="text-5xl font-extrabold tracking-widest text-[#174AE6] dark:text-[#0a0a0a] mb-2 uppercase">Certificate</h1>
+        <div className="text-xl tracking-widest text-gray-700 dark:text-[#0a0a0a] mb-6 uppercase">of Completion</div>
         {/* Subtitle */}
-        <div className="text-base tracking-wide text-gray-700 mb-6 uppercase">This certificate is proudly presented to</div>
+        <div className="text-base tracking-wide text-gray-700 dark:text-[#0a0a0a] mb-6 uppercase">This certificate is proudly presented to</div>
         {/* Recipient Name (Elegant font) */}
         <div
           className="mb-4 text-5xl font-bold text-center"
@@ -47,23 +47,23 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
           {studentName}
         </div>
         {/* Description */}
-        <div className="text-center text-gray-700 mb-8 max-w-2xl mx-auto">
+        <div className="text-center text-gray-700 dark:text-[#0a0a0a] mb-8 max-w-2xl mx-auto">
           {description ||
             'For outstanding completion and achievement. We recognize your dedication and hard work.'}
         </div>
         {/* Title (e.g., course or award) */}
-        <div className="text-lg text-center font-semibold mb-2">{title}</div>
+        <div className="text-lg text-center font-semibold mb-2 dark:text-[#0a0a0a]">{title}</div>
         {sessionName && (
-          <div className="text-md text-center text-gray-600 mb-8 italic">Session: {sessionName}</div>
+          <div className="text-md text-center text-gray-600 dark:text-[#0a0a0a] mb-8 italic">Session: {sessionName}</div>
         )}
         {/* Date, Seal, Signature */}
         <div className="flex items-end justify-between w-full mt-12 px-16">
           <div className="flex flex-col items-center">
             <div className="relative w-40 mb-1">
               <div className="border-t-2 border-gray-400 w-full" />
-              <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-800 whitespace-nowrap">{new Date(dateIssued).toLocaleDateString()}</span>
+              <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-800 dark:text-[#0a0a0a] whitespace-nowrap">{new Date(dateIssued).toLocaleDateString()}</span>
             </div>
-            <div className="text-xs text-gray-600">Date</div>
+            <div className="text-xs text-gray-600 dark:text-[#0a0a0a]">Date</div>
           </div>
           {/* Circular Seal */}
           <div className="flex flex-col items-center">
@@ -72,11 +72,11 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
               <circle cx="32" cy="32" r="18" stroke="#2563eb" strokeWidth="2" fill="#fff" />
               <text x="32" y="37" textAnchor="middle" fontSize="16" fill="#2563eb" fontWeight="bold">Seal</text>
             </svg>
-            <div className="text-xs text-gray-600 mt-1">Official Seal</div>
+            <div className="text-xs text-gray-600 dark:text-[#0a0a0a] mt-1">Official Seal</div>
           </div>
           <div className="flex flex-col items-center">
             <div className="border-t-2 border-gray-400 w-40 mb-1" />
-            <div className="text-xs text-gray-600">Signature</div>
+            <div className="text-xs text-gray-600 dark:text-[#0a0a0a]">Signature</div>
           </div>
         </div>
         {/* Revoke Badge */}

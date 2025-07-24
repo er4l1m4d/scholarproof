@@ -149,7 +149,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         style={{ minWidth: 256 }}
       >
         <div className="mb-8 flex items-center justify-between">
-          <span className="text-xl font-black text-blue-800 dark:text-blue-200">ScholarProof</span>
+          <span className="text-xl font-black text-[#174AE6] dark:text-[#0a0a0a]">ScholarProof</span>
           {/* Close button (all screens) */}
           <button
             className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition ml-auto font-medium"
@@ -167,11 +167,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
                   href={tab.href}
                   className={`flex items-center gap-3 px-4 py-2 rounded transition font-medium ${
                     pathname === tab.href
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-[#0a0a0a]'
+                      : 'text-gray-700 dark:text-[#0a0a0a] hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
-                  {React.cloneElement(icons[tab.name as keyof typeof icons], { className: 'w-5 h-5 text-gray-900 dark:text-gray-100' })}
+                  {React.cloneElement(icons[tab.name as keyof typeof icons], { className: 'w-5 h-5 text-gray-900 dark:text-[#0a0a0a]' })}
                   <span className="font-medium">{tab.name}</span>
                 </Link>
               </li>
@@ -198,20 +198,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
             >
               <span className="text-2xl font-black">0</span>
             </button>
-            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-black">
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:text-[#0a0a0a] text-sm font-black">
               {role.charAt(0).toUpperCase() + role.slice(1)}
             </span>
           </div>
           <div className="flex items-center gap-4">
             {/* Placeholder avatar (topbar) */}
-            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-200 font-black overflow-hidden">
+            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-[#0a0a0a] font-black overflow-hidden">
               {/* Removed profile picture display */}
               <span>{role.charAt(0).toUpperCase()}</span>
             </div>
             {/* Menu */}
             <div className="relative profile-menu">
               <button
-                className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-900 dark:text-gray-100"
+                className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-900 dark:text-[#0a0a0a]"
                 onClick={() => setMenuOpen(open => !open)}
                 aria-haspopup="true"
                 aria-expanded={menuOpen}
@@ -236,11 +236,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-md relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={() => setShowProfileModal(false)} aria-label="Close">&times;</button>
-            <h3 className="text-xl font-black mb-4 text-blue-800">Edit Profile</h3>
+            <h3 className="text-xl font-black mb-4 text-[#174AE6] dark:text-[#0a0a0a]">Edit Profile</h3>
             <form onSubmit={handleProfileSave} className="space-y-4">
               <div>
-                <label className="block mb-1 font-medium text-gray-900 dark:text-gray-100">Name</label>
-                <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={profileName} onChange={e => setProfileName(e.target.value)} required />
+                <label className="block mb-1 font-medium text-gray-900 dark:text-[#0a0a0a]">Name</label>
+                <input type="text" className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-[#0a0a0a]" value={profileName} onChange={e => setProfileName(e.target.value)} required />
               </div>
               {profileError && <div className="text-red-600 text-sm">{profileError}</div>}
               {profileSuccess && <div className="text-green-600 text-sm">{profileSuccess}</div>}
