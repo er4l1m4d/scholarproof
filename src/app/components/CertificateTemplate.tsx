@@ -54,9 +54,11 @@ const CertificateTemplate: React.FC<CertificateTemplateProps> = ({
         {/* Date, Seal, Signature */}
         <div className="flex items-end justify-between w-full mt-12 px-16">
           <div className="flex flex-col items-center">
-            <div className="border-t-2 border-gray-400 w-40 mb-1" />
+            <div className="relative w-40 mb-1">
+              <div className="border-t-2 border-gray-400 w-full" />
+              <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-800 whitespace-nowrap">{new Date(dateIssued).toLocaleDateString()}</span>
+            </div>
             <div className="text-xs text-gray-600">Date</div>
-            <div className="text-sm text-gray-800">{new Date(dateIssued).toLocaleDateString()}</div>
           </div>
           {/* Circular Seal */}
           <div className="flex flex-col items-center">
