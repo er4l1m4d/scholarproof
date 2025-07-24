@@ -95,7 +95,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg max-w-5xl w-full mx-4 relative">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] mx-4 relative flex flex-col">
         <button
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
           onClick={() => { reset(); onClose(); }}
@@ -103,9 +103,9 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
         >
           &times;
         </button>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10 overflow-auto">
           {/* Left: Form */}
-          <div>
+          <div className="flex flex-col justify-center">
             <h2 className="text-xl font-bold mb-6">Issue New Certificate</h2>
             {loading ? (
               <div>Loading...</div>
@@ -186,9 +186,9 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
             )}
           </div>
           {/* Right: Live Preview */}
-          <div className="flex flex-col items-center justify-center bg-gray-50">
+          <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Certificate Preview</h2>
-            <div className="w-full max-w-xl">
+            <div className="w-full max-w-xl mx-auto bg-white p-4 rounded shadow overflow-auto">
               <CertificateTemplate
                 studentName={
                   students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
