@@ -33,11 +33,14 @@ export default function AdminCertificatesPage() {
           .order("uploaded_at", { ascending: false });
         if (error) throw error;
         setCertificates(
-          (data || []).map((cert: any) => ({
-            ...cert,
-            student_name: cert.students?.full_name,
-            session_name: cert.sessions?.name,
-          }))
+          (data || []).map((cert) => {
+            const c = cert as Record<string, unknown>;
+            return {
+              ...c,
+              student_name: (c.students as { full_name?: string } | undefined)?.full_name,
+              session_name: (c.sessions as { name?: string } | undefined)?.name,
+            } as Certificate;
+          })
         );
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to fetch certificates");
