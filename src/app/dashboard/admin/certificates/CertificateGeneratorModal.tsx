@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/app/supabaseClient";
 import CertificateTemplate from "@/app/components/CertificateTemplate";
+import { exportCertificate } from "@/utils/exportCertificate";
+import { uploadToIrys } from "@/utils/uploadToIrys";
+import { saveCertificateToSupabase } from "@/utils/saveCertificateToSupabase";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   studentId: z.string().uuid({ message: "Student is required" }),
@@ -55,6 +59,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
   });
 
   const formValues = watch();
+  const certPreviewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -87,11 +92,37 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
 
   // Removed dynamic scaling effect useEffect
 
-  const onSubmit = (data: FormData) => {
-    // TODO: Implement actual certificate creation logic
-    onSuccess();
-    reset();
-    onClose();
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      let irys_url = "";
+      if (data.uploadToIrys && certPreviewRef.current) {
+        // Export certificate as PNG
+        const blob = await exportCertificate(certPreviewRef.current, "png");
+        // Upload to Irys
+        const irysResult = await uploadToIrys(blob);
+        irys_url = irysResult.irys_url;
+      }
+      // Save certificate to Supabase
+      const { error: saveError } = await saveCertificateToSupabase({
+        student_id: data.studentId,
+        session_id: data.sessionId,
+        title: data.title,
+        description: data.description,
+        irys_url,
+        revoked: false,
+      });
+      if (saveError) throw saveError;
+      toast.success("Certificate generated successfully!");
+      onSuccess();
+      reset();
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create certificate");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!open) return null;
@@ -192,7 +223,10 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
           <div className="flex flex-col items-center justify-center bg-gray-50 min-h-[400px] h-[500px] md:h-[600px]">
             <h2 className="text-xl font-semibold mb-4 text-center">Live Certificate Preview</h2>
             <div className="relative w-full h-[500px] border rounded-lg bg-white overflow-hidden">
-              <div className="absolute top-1/2 left-1/2 origin-center scale-[0.4] -translate-x-1/2 -translate-y-1/2">
+              <div
+                ref={certPreviewRef}
+                className="absolute top-1/2 left-1/2 origin-center scale-[0.4] -translate-x-1/2 -translate-y-1/2"
+              >
                 <CertificateTemplate
                   studentName={
                     students.find((s) => s.id === formValues.studentId)?.name || "Student Name"
