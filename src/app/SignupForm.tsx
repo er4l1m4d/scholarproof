@@ -113,17 +113,17 @@ const SignupForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow font-sans">
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow font-sans">
         <img src="/ScholarProof Logo.png" alt="ScholarProof Logo" className="mx-auto mb-4 h-12 w-12" />
-        <h2 className="text-2xl font-black mb-6 text-center text-[#174AE6] dark:text-[#0a0a0a]">Sign Up</h2>
-        {errors.general && <p className="text-red-500 dark:text-red-400 text-center mb-4 font-medium">{errors.general}</p>}
-        {success && <p className="text-green-600 dark:text-green-400 text-center mb-4 font-medium">{success}</p>}
+        <h2 className="text-2xl font-black mb-6 text-center text-[#174AE6]">Sign Up</h2>
+        {errors.general && <p className="text-red-500 text-center mb-4 font-medium">{errors.general}</p>}
+        {success && <p className="text-green-600 text-center mb-4 font-medium">{success}</p>}
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-gray-900 dark:text-[#0a0a0a]" htmlFor="email">Email</label>
+          <label className="block mb-1 font-medium text-gray-900" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-[#0a0a0a] font-medium"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white text-gray-900 font-medium"
             value={email}
             onChange={e => setEmail(e.target.value)}
             disabled={loading}
@@ -131,11 +131,11 @@ const SignupForm = () => {
           {errors.email && <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{errors.email}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-gray-900 dark:text-[#0a0a0a]" htmlFor="password">Password</label>
+          <label className="block mb-1 font-medium text-gray-900" htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-[#0a0a0a] font-medium"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white text-gray-900 font-medium"
             value={password}
             onChange={e => setPassword(e.target.value)}
             disabled={loading}
@@ -143,11 +143,11 @@ const SignupForm = () => {
           {errors.password && <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{errors.password}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-gray-900 dark:text-[#0a0a0a]" htmlFor="inviteCode">Invite Code <span className="text-gray-400 dark:text-gray-500 text-xs font-medium">(optional for students)</span></label>
+          <label className="block mb-1 font-medium text-gray-900" htmlFor="inviteCode">Invite Code <span className="text-gray-400 dark:text-gray-500 text-xs font-medium">(optional for students)</span></label>
           <input
             id="inviteCode"
             type="text"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-[#0a0a0a] font-medium"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300 bg-white text-gray-900 font-medium"
             value={inviteCode}
             onChange={e => setInviteCode(e.target.value)}
             disabled={loading}

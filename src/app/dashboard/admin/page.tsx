@@ -16,7 +16,7 @@ interface SessionSummary {
 
 interface StudentSummary {
   id: string;
-  full_name: string;
+  name: string;
   email: string;
   certCount: number;
 }
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
                     : studentSummaries.filter(s => s.certCount > 0 && sessionSummaries.find(sess => sess.id === selectedStudentSessionId && sess.certCount > 0)))
                     .map((s) => (
                     <tr key={s.id} className="border-t border-gray-200 dark:border-gray-700">
-                      <td className="px-4 py-2">{s.full_name}</td>
+                      <td className="px-4 py-2">{s.name}</td>
                       <td className="px-4 py-2">{s.email}</td>
                       <td className="px-4 py-2">{s.certCount}</td>
                     </tr>
@@ -218,7 +218,7 @@ export default function AdminDashboard() {
                   ? studentSummaries
                   : studentSummaries.filter(s => s.certCount > 0 && sessionSummaries.find(sess => sess.id === selectedStudentSessionId && sess.certCount > 0))} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="full_name" tick={{ fontSize: 12 }} />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
                   <Bar dataKey="certCount" fill="#059669" radius={[4, 4, 0, 0]} />
