@@ -14,7 +14,7 @@ interface Certificate {
   irys_url: string;
   revoked: boolean;
   uploaded_at: string;
-  student_name?: string;
+  users?: { name?: string };
   session_name?: string;
 }
 
@@ -33,13 +33,13 @@ export default function CertificateDetailPage() {
         // Fetch certificate
         const { data, error } = await supabase
           .from("certificates")
-          .select("*, student:student_id(name), sessions:session_id(name)")
+          .select("*, users(name), sessions:session_id(name)")
           .eq("id", id)
           .single();
         if (error || !data) throw error || new Error("Certificate not found");
         setCertificate({
           ...data,
-          student_name: data.student?.name,
+          student_name: data.users?.name,
           session_name: data.sessions?.name,
         });
       } catch (err: unknown) {
@@ -77,7 +77,7 @@ export default function CertificateDetailPage() {
     <div className="max-w-3xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-6">Certificate Details</h1>
       <CertificateTemplate
-        studentName={certificate.student_name || certificate.student_id}
+        studentName={certificate.users?.name || certificate.student_id}
         title={certificate.title}
         description={certificate.description}
         dateIssued={certificate.uploaded_at}

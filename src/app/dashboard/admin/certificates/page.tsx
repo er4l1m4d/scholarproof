@@ -16,21 +16,20 @@ interface Certificate {
   irys_url: string;
   revoked: boolean;
   uploaded_at: string;
-  student_name?: string;
-  session_name?: string;
-  student?: { name?: string };
+  users?: { name?: string };
   sessions?: { name?: string };
+  session_name?: string;
 }
 
 const fetcher = async (url: string): Promise<Certificate[]> => {
   const { data, error } = await supabase
     .from(url.split("/")[2]) // Extract table name from URL
-    .select("*, student:student_id(name), sessions:session_id(name)")
+    .select("*, users(name), sessions:session_id(name)")
     .order("uploaded_at", { ascending: false });
   if (error) throw error;
   return (data || []).map((cert: Certificate) => ({
     ...cert,
-    student_name: cert.student?.name,
+    student_name: cert.users?.name,
     session_name: cert.sessions?.name,
   }));
 };
@@ -77,7 +76,7 @@ export default function AdminCertificatesPage() {
               <tbody>
                 {certificates.map((cert: Certificate) => (
                   <tr key={cert.id} className="border-t hover:bg-gray-50">
-                    <td className="py-2 px-4">{cert.student_name || cert.student_id}</td>
+                    <td className="py-2 px-4">{cert.users?.name || cert.student_id}</td>
                     <td className="py-2 px-4">{cert.session_name || cert.session_id}</td>
                     <td className="py-2 px-4">{cert.title}</td>
                     <td className="py-2 px-4">
