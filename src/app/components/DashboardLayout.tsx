@@ -198,7 +198,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role, children, setNa
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
-              <span className="text-2xl font-black">0</span>
+              <img src="/ScholarProof Logo.png" alt="Open sidebar" className="h-8 w-8" />
             </button>
             <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:text-[#0a0a0a] text-sm font-black">
               {role.charAt(0).toUpperCase() + role.slice(1)}
