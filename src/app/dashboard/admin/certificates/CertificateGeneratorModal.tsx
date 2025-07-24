@@ -20,7 +20,7 @@ type FormData = z.infer<typeof schema>;
 
 interface Student {
   id: string;
-  full_name: string;
+  name: string;
 }
 interface Session {
   id: string;
@@ -65,7 +65,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
         // Fetch students
         const { data: studentsData, error: studentsError } = await supabase
           .from("users")
-          .select("id, full_name")
+          .select("id, name")
           .eq("role", "student");
         if (studentsError) throw studentsError;
         setStudents((studentsData as Student[]) || []);
@@ -123,7 +123,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
                     <option value="">Select student</option>
                     {students.map((student) => (
                       <option key={student.id} value={student.id}>
-                        {student.full_name || student.id}
+                        {student.name || student.id}
                       </option>
                     ))}
                   </select>
@@ -195,7 +195,7 @@ const CertificateGeneratorModal: React.FC<CertificateGeneratorModalProps> = ({ o
               <div className="absolute top-1/2 left-1/2 origin-center scale-[0.4] -translate-x-1/2 -translate-y-1/2">
                 <CertificateTemplate
                   studentName={
-                    students.find((s) => s.id === formValues.studentId)?.full_name || "Student Name"
+                    students.find((s) => s.id === formValues.studentId)?.name || "Student Name"
                   }
                   title={formValues.title || "Course Title"}
                   description={formValues.description || "This certificate is awarded to the student for successfully completing the course."}
