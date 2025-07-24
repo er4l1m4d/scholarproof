@@ -69,6 +69,8 @@ export default function AdminCertificatesPage() {
                   <th className="py-2 px-4">Student</th>
                   <th className="py-2 px-4">Session</th>
                   <th className="py-2 px-4">Title</th>
+                  <th className="py-2 px-4">Date Issued</th>
+                  <th className="py-2 px-4">Irys URL</th>
                   <th className="py-2 px-4">Status</th>
                   <th className="py-2 px-4">Actions</th>
                 </tr>
@@ -78,19 +80,43 @@ export default function AdminCertificatesPage() {
                   <tr key={cert.id} className="border-t hover:bg-gray-50">
                     <td className="py-2 px-4">{cert.users?.name || cert.student_id}</td>
                     <td className="py-2 px-4">{cert.session_name || cert.session_id}</td>
-                    <td className="py-2 px-4">{cert.title}</td>
+                    <td className="py-2 px-4">
+                      <Link href={`/dashboard/admin/certificates/${cert.id}`} className="text-blue-700 underline font-medium">
+                        {cert.title}
+                      </Link>
+                    </td>
+                    <td className="py-2 px-4">{cert.uploaded_at ? new Date(cert.uploaded_at).toLocaleDateString() : ''}</td>
+                    <td className="py-2 px-4">
+                      {cert.irys_url ? (
+                        <a href={cert.irys_url} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline break-all">Irys Link</a>
+                      ) : (
+                        <span className="text-gray-400">Not uploaded</span>
+                      )}
+                    </td>
                     <td className="py-2 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-bold ${cert.revoked ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
                         {cert.revoked ? "Revoked" : "Active"}
                       </span>
                     </td>
-                    <td className="py-2 px-4">
+                    <td className="py-2 px-4 flex gap-2 items-center">
                       <Link
                         href={`/dashboard/admin/certificates/${cert.id}`}
                         className="text-blue-700 underline font-medium"
                       >
                         View
                       </Link>
+                      {!cert.irys_url && !cert.revoked && (
+                        <button
+                          className="bg-purple-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-purple-700 transition"
+                          onClick={async () => {
+                            // Call API or function to upload to Irys (implement as needed)
+                            // After upload, revalidate
+                            alert('Upload to Irys not yet implemented.');
+                          }}
+                        >
+                          Upload to Irys
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
